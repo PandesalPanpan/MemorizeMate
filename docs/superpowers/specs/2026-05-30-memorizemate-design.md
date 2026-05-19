@@ -31,6 +31,7 @@ MemorizeMate is an offline-first, installable **PWA** flashcard app — "Anki wi
 - **Audio/haptics:** Web Audio API + `navigator.vibrate`, gated by a Settings toggle.
 - **Testing:** Vitest + React Testing Library (unit/component); Playwright (e2e, Phase 2).
 - **Hosting:** public static host (Netlify / Vercel / GitHub Pages).
+- **Containerization:** Docker with separate **dev** (hot-reload Vite) and **prod** (multi-stage build → nginx static serve) images, orchestrated via `docker-compose`, plus a committed `.env.example` sample.
 
 ## Data Model
 
