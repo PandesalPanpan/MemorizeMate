@@ -1,0 +1,60 @@
+import type { Card as FsrsCard } from 'ts-fsrs';
+
+export const RATINGS = ['again', 'hard', 'good', 'easy'] as const;
+export type Rating = (typeof RATINGS)[number];
+export function isRating(v: unknown): v is Rating {
+  return typeof v === 'string' && (RATINGS as readonly string[]).includes(v);
+}
+
+export type CardType = 'basic' | 'cloze';
+
+export interface Deck {
+  id: string;
+  name: string;
+  description: string;
+  color: string;       // token key or hex
+  icon: string;        // emoji or icon name
+  desiredRetention: number; // 0.7 - 0.97
+  createdAt: number;   // epoch ms
+}
+
+export interface Card {
+  id: string;
+  deckId: string;
+  type: CardType;
+  front: string;       // basic: question; cloze: source text with {{cN::}}
+  back: string;        // basic: answer; cloze: unused ('')
+  tags: string[];
+  srs: FsrsCard;       // ts-fsrs card (due/last_review are Date objects)
+  lapses: number;      // mirror for quick leech checks
+  leech: boolean;
+  createdAt: number;
+}
+
+export interface ReviewLog {
+  id: string;
+  cardId: string;
+  timestamp: number;   // epoch ms
+  rating: Rating;
+  elapsedDays: number;
+  scheduledDays: number;
+}
+
+export interface NotificationSettings {
+  enabled: boolean;
+  reminderHour: number; // 0-23
+}
+
+export interface Settings {
+  theme: 'light' | 'dark' | 'auto';
+  soundEnabled: boolean;
+  reduceMotion: boolean;
+  notifications: NotificationSettings;
+}
+
+export const DEFAULT_SETTINGS: Settings = {
+  theme: 'auto',
+  soundEnabled: true,
+  reduceMotion: false,
+  notifications: { enabled: false, reminderHour: 9 },
+};
