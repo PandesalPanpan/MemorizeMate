@@ -16,7 +16,7 @@ const Router = (import.meta as any).vitest ? MemoryRouter : BrowserRouter;
 
 export function App() {
   const theme = useStore((s) => s.settings.theme);
-  useEffect(() => { store.getState().load(); }, []);
+  useEffect(() => { store.getState().load().catch(console.error); }, []);
   return (
     <ThemeProvider theme={theme}>
       <Router>

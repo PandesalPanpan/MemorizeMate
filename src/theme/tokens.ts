@@ -40,6 +40,8 @@ export function cssVars(mode: ThemeMode): Record<string, string> {
     '--color-muted': c.muted,
     '--font-display': tokens.font.display,
     '--font-body': tokens.font.body,
+    '--radius-pill': tokens.radius.pill,
+    '--space-md': tokens.space.md,
     '--radius-md': tokens.radius.md,
     '--radius-lg': tokens.radius.lg,
     '--shadow-card': tokens.shadow.card,

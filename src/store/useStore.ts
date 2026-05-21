@@ -12,6 +12,8 @@ export interface StoreState {
   repo: Repository;
   decks: Deck[];
   settings: Settings;
+  error: string | null;
+  _setError(e: unknown): void;
   load(): Promise<void>;
   createDeck(input: { name: string; description: string }): Promise<Deck>;
   updateDeck(deck: Deck): Promise<void>;
@@ -27,20 +29,31 @@ export function createStore(repo: Repository = defaultRepo) {
     repo,
     decks: [],
     settings: DEFAULT_SETTINGS,
+    error: null,
+
+    _setError(e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error('MemorizeMate store error:', msg);
+      set({ error: msg });
+    },
 
     async load() {
-      const r = get().repo;
-      set({ decks: await r.listDecks(), settings: await r.getSettings() });
+      try {
+        const r = get().repo;
+        set({ decks: await r.listDecks(), settings: await r.getSettings(), error: null });
+      } catch (e) { get()._setError(e); }
     },
 
     async createDeck({ name, description }) {
-      const deck: Deck = {
-        id: id(), name, description, color: 'accent', icon: '📘',
-        desiredRetention: 0.9, createdAt: Date.now(),
-      };
-      await get().repo.putDeck(deck);
-      set({ decks: [...get().decks, deck] });
-      return deck;
+      try {
+        const deck: Deck = {
+          id: id(), name, description, color: 'accent', icon: '📘',
+          desiredRetention: 0.9, createdAt: Date.now(),
+        };
+        await get().repo.putDeck(deck);
+        set({ decks: [...get().decks, deck] });
+        return deck;
+      } catch (e) { get()._setError(e); throw e; }
     },
 
     async updateDeck(deck) {
@@ -49,17 +62,21 @@ export function createStore(repo: Repository = defaultRepo) {
     },
 
     async removeDeck(deckId) {
-      await get().repo.deleteDeck(deckId);
-      set({ decks: get().decks.filter((d) => d.id !== deckId) });
+      try {
+        await get().repo.deleteDeck(deckId);
+        set({ decks: get().decks.filter((d) => d.id !== deckId) });
+      } catch (e) { get()._setError(e); throw e; }
     },
 
     async addCard({ deckId, type, front, back, tags }) {
-      const card: Card = {
-        id: id(), deckId, type, front, back, tags,
-        srs: newCard(new Date()), lapses: 0, leech: false, createdAt: Date.now(),
-      };
-      await get().repo.putCard(card);
-      return card;
+      try {
+        const card: Card = {
+          id: id(), deckId, type, front, back, tags,
+          srs: newCard(new Date()), lapses: 0, leech: false, createdAt: Date.now(),
+        };
+        await get().repo.putCard(card);
+        return card;
+      } catch (e) { get()._setError(e); throw e; }
     },
 
     async dueCards(deckId, now) {
@@ -68,24 +85,28 @@ export function createStore(repo: Repository = defaultRepo) {
     },
 
     async updateSettings(patch) {
-      const settings = { ...get().settings, ...patch };
-      await get().repo.putSettings(settings);
-      set({ settings });
+      try {
+        const settings = { ...get().settings, ...patch };
+        await get().repo.putSettings(settings);
+        set({ settings });
+      } catch (e) { get()._setError(e); throw e; }
     },
 
     async reviewCard(cardId, rating, now) {
-      const r = get().repo;
-      const card = await r.getCard(cardId);
-      if (!card) return;
-      const deck = await r.getDeck(card.deckId);
-      const { card: srs, log } = grade(card.srs, rating, now, deck?.desiredRetention ?? 0.9);
-      const lapses = srs.lapses;
-      const updated: Card = { ...card, srs, lapses, leech: lapses >= LEECH_THRESHOLD };
-      await r.putCard(updated);
-      await r.addReviewLog({
-        id: id(), cardId, timestamp: now.getTime(), rating,
-        elapsedDays: log.elapsedDays, scheduledDays: log.scheduledDays,
-      });
+      try {
+        const r = get().repo;
+        const card = await r.getCard(cardId);
+        if (!card) return;
+        const deck = await r.getDeck(card.deckId);
+        const { card: srs, log } = grade(card.srs, rating, now, deck?.desiredRetention ?? 0.9);
+        const lapses = srs.lapses;
+        const updated: Card = { ...card, srs, lapses, leech: lapses >= LEECH_THRESHOLD };
+        await r.putCard(updated);
+        await r.addReviewLog({
+          id: id(), cardId, timestamp: now.getTime(), rating,
+          elapsedDays: log.elapsedDays, scheduledDays: log.scheduledDays,
+        });
+      } catch (e) { get()._setError(e); throw e; }
     },
   }));
 }

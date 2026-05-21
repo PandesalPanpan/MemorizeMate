@@ -8,7 +8,7 @@ export function SettingsScreen() {
       <h2>Settings</h2>
 
       <label htmlFor="theme">Theme</label>
-      <select id="theme" value={settings.theme} onChange={(e) => set({ theme: e.target.value as any })}>
+      <select id="theme" value={settings.theme} onChange={(e) => set({ theme: e.target.value as 'light' | 'dark' | 'auto' })}>
         <option value="auto">Auto</option>
         <option value="light">Light</option>
         <option value="dark">Dark</option>
