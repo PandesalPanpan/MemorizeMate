@@ -28,7 +28,8 @@ export function createStore(repo: Repository = defaultRepo) {
     settings: DEFAULT_SETTINGS,
 
     async load() {
-      set({ decks: await repo.listDecks(), settings: await repo.getSettings() });
+      const r = get().repo;
+      set({ decks: await r.listDecks(), settings: await r.getSettings() });
     },
 
     async createDeck({ name, description }) {
@@ -36,18 +37,18 @@ export function createStore(repo: Repository = defaultRepo) {
         id: id(), name, description, color: 'accent', icon: '📘',
         desiredRetention: 0.9, createdAt: Date.now(),
       };
-      await repo.putDeck(deck);
+      await get().repo.putDeck(deck);
       set({ decks: [...get().decks, deck] });
       return deck;
     },
 
     async updateDeck(deck) {
-      await repo.putDeck(deck);
+      await get().repo.putDeck(deck);
       set({ decks: get().decks.map((d) => (d.id === deck.id ? deck : d)) });
     },
 
     async removeDeck(deckId) {
-      await repo.deleteDeck(deckId);
+      await get().repo.deleteDeck(deckId);
       set({ decks: get().decks.filter((d) => d.id !== deckId) });
     },
 
@@ -56,24 +57,25 @@ export function createStore(repo: Repository = defaultRepo) {
         id: id(), deckId, type, front, back, tags,
         srs: newCard(new Date()), lapses: 0, leech: false, createdAt: Date.now(),
       };
-      await repo.putCard(card);
+      await get().repo.putCard(card);
       return card;
     },
 
     async dueCards(deckId, now) {
-      const cards = await repo.listCards(deckId);
+      const cards = await get().repo.listCards(deckId);
       return cards.filter((c) => isDue(c.srs, now));
     },
 
     async reviewCard(cardId, rating, now) {
-      const card = await repo.getCard(cardId);
+      const r = get().repo;
+      const card = await r.getCard(cardId);
       if (!card) return;
-      const deck = await repo.getDeck(card.deckId);
+      const deck = await r.getDeck(card.deckId);
       const { card: srs, log } = grade(card.srs, rating, now, deck?.desiredRetention ?? 0.9);
       const lapses = srs.lapses;
       const updated: Card = { ...card, srs, lapses, leech: lapses >= LEECH_THRESHOLD };
-      await repo.putCard(updated);
-      await repo.addReviewLog({
+      await r.putCard(updated);
+      await r.addReviewLog({
         id: id(), cardId, timestamp: now.getTime(), rating,
         elapsedDays: log.elapsedDays, scheduledDays: log.scheduledDays,
       });
