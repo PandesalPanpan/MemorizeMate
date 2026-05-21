@@ -19,6 +19,7 @@ export interface StoreState {
   addCard(input: { deckId: string; type: Card['type']; front: string; back: string; tags: string[] }): Promise<Card>;
   dueCards(deckId: string, now: Date): Promise<Card[]>;
   reviewCard(cardId: string, rating: Rating, now: Date): Promise<void>;
+  updateSettings(patch: Partial<Settings>): Promise<void>;
 }
 
 export function createStore(repo: Repository = defaultRepo) {
@@ -64,6 +65,12 @@ export function createStore(repo: Repository = defaultRepo) {
     async dueCards(deckId, now) {
       const cards = await get().repo.listCards(deckId);
       return cards.filter((c) => isDue(c.srs, now));
+    },
+
+    async updateSettings(patch) {
+      const settings = { ...get().settings, ...patch };
+      await get().repo.putSettings(settings);
+      set({ settings });
     },
 
     async reviewCard(cardId, rating, now) {
