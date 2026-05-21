@@ -4,15 +4,16 @@ import {
   createEmptyCard,
   Rating as FsrsRating,
   type Card as FsrsCard,
+  type Grade,
   type RecordLogItem,
 } from 'ts-fsrs';
 import type { Rating } from '../types/models';
 
-const RATING_MAP: Record<Rating, FsrsRating> = {
-  again: FsrsRating.Again,
-  hard: FsrsRating.Hard,
-  good: FsrsRating.Good,
-  easy: FsrsRating.Easy,
+const RATING_MAP: Record<Rating, Grade> = {
+  again: FsrsRating.Again as Grade,
+  hard: FsrsRating.Hard as Grade,
+  good: FsrsRating.Good as Grade,
+  easy: FsrsRating.Easy as Grade,
 };
 
 function engine(desiredRetention = 0.9) {
