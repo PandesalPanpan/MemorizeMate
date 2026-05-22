@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { store } from '../store/useStore';
+import { Button } from '../components/ui/Button';
 import type { Card, Deck } from '../types/models';
+import styles from './DeckDetailScreen.module.css';
 
 export function DeckDetailScreen() {
   const { deckId } = useParams();
@@ -17,11 +19,14 @@ export function DeckDetailScreen() {
   if (!deck) return <p>Loading…</p>;
   return (
     <section>
-      <h2>{deck.icon} {deck.name}</h2>
-      <p style={{ color: 'var(--color-muted)' }}>{cards.length} cards</p>
-      <div style={{ display: 'flex', gap: 8 }}>
-        <Link to={`/decks/${deck.id}/study`}>Study</Link>
-        <Link to={`/decks/${deck.id}/cards/new`}>Add card</Link>
+      <div className={styles.head}>
+        <span className={styles.icon}>{deck.icon}</span>
+        <h2>{deck.name}</h2>
+      </div>
+      <p className={styles.meta}>{cards.length} {cards.length === 1 ? 'card' : 'cards'}</p>
+      <div className={styles.actions}>
+        <Link to={`/decks/${deck.id}/study`}><Button>Study</Button></Link>
+        <Link to={`/decks/${deck.id}/cards/new`}><Button variant="outline">Add card</Button></Link>
       </div>
     </section>
   );

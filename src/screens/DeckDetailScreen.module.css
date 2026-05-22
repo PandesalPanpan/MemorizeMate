@@ -1,0 +1,4 @@
+.head { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-sm); }
+.icon { font-size: 2.4rem; }
+.meta { color: var(--color-muted); margin-bottom: var(--space-lg); }
+.actions { display: flex; gap: var(--space-sm); flex-wrap: wrap; }

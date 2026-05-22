@@ -1,0 +1,5 @@
+.hero { margin-bottom: var(--space-xl); }
+.greeting { font-size: var(--step-4); margin-bottom: var(--space-md); }
+.activity { margin-top: var(--space-xl); }
+.activity h3 { margin-bottom: var(--space-md); }
+.card { background: var(--color-surface); border: 1px solid var(--color-line); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); padding: var(--space-lg); overflow-x: auto; }

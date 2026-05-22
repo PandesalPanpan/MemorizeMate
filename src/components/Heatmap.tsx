@@ -1,10 +1,13 @@
+import styles from './Heatmap.module.css';
+
 function dayKey(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 function shade(count: number): string {
-  if (count === 0) return 'var(--color-surface)';
-  if (count < 5) return 'var(--color-accent-soft)';
-  return 'var(--color-accent)';
+  if (count === 0) return 'var(--color-sunken)';
+  if (count < 3) return 'var(--color-accent-soft)';
+  if (count < 8) return 'var(--color-accent)';
+  return 'var(--color-accent-deep)';
 }
 
 export function Heatmap({ counts, days = 84, today = new Date() }: { counts: Record<string, number>; days?: number; today?: Date }) {
@@ -14,9 +17,20 @@ export function Heatmap({ counts, days = 84, today = new Date() }: { counts: Rec
     const key = dayKey(d);
     const c = counts[key] ?? 0;
     cells.push(
-      <div key={key} title={`${key}: ${c} reviews`}
-        style={{ width: 12, height: 12, borderRadius: 3, background: shade(c) }} />,
+      <div key={key} className={styles.cell} title={`${key}: ${c} reviews`} style={{ background: shade(c) }} />,
     );
   }
-  return <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 12px)', gap: 3 }}>{cells}</div>;
+  return (
+    <div className={styles.wrap}>
+      <div className={styles.grid}>{cells}</div>
+      <div className={styles.legend}>
+        <span>Less</span>
+        <span className={styles.swatch} style={{ background: 'var(--color-sunken)' }} />
+        <span className={styles.swatch} style={{ background: 'var(--color-accent-soft)' }} />
+        <span className={styles.swatch} style={{ background: 'var(--color-accent)' }} />
+        <span className={styles.swatch} style={{ background: 'var(--color-accent-deep)' }} />
+        <span>More</span>
+      </div>
+    </div>
+  );
 }

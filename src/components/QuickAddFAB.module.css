@@ -1,0 +1,16 @@
+.fab {
+  position: fixed;
+  right: var(--space-lg);
+  bottom: calc(var(--bottomnav-h) + var(--space-md) + env(safe-area-inset-bottom, 0px));
+  width: 60px; height: 60px;
+  border: none; border-radius: var(--radius-pill);
+  background: var(--color-accent); color: #fff;
+  font-size: 30px; line-height: 1;
+  box-shadow: var(--shadow-raised);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 25;
+  transition: transform var(--motion-fast) var(--spring), background var(--motion-fast) var(--ease);
+}
+.fab:hover { background: var(--color-accent-deep); transform: scale(1.06); }
+.fab:active { transform: scale(0.96); }
+@media (min-width: 900px) { .fab { bottom: var(--space-xl); } }

@@ -1,8 +1,12 @@
+import styles from './StreakBadge.module.css';
+
 export function StreakBadge({ streak }: { streak: number }) {
+  const lit = streak > 0;
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-      <span style={{ fontSize: 28 }}>{streak > 0 ? '🔥' : '🌱'}</span>
-      <strong>{streak} day streak</strong>
+    <div className={styles.badge}>
+      <span className={`${styles.flame} ${lit ? styles.lit : ''}`}>{lit ? '🔥' : '🌱'}</span>
+      <span className={styles.count}>{streak}</span>
+      <span className={styles.label}>day streak</span>
     </div>
   );
 }
