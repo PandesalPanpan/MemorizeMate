@@ -8,10 +8,27 @@ function resolveMode(theme: 'light' | 'dark' | 'auto'): ThemeMode {
   return theme;
 }
 
-export function ThemeProvider({ theme, children }: { theme: 'light' | 'dark' | 'auto'; children: ReactNode }) {
+export function ThemeProvider({
+  theme,
+  reduceMotion = false,
+  children,
+}: {
+  theme: 'light' | 'dark' | 'auto';
+  reduceMotion?: boolean;
+  children: ReactNode;
+}) {
   useEffect(() => {
-    const vars = cssVars(resolveMode(theme));
-    for (const [k, v] of Object.entries(vars)) document.documentElement.style.setProperty(k, v);
+    const mode = resolveMode(theme);
+    const vars = cssVars(mode);
+    const root = document.documentElement;
+    for (const [k, v] of Object.entries(vars)) root.style.setProperty(k, v);
+    root.style.colorScheme = mode;
+    root.dataset.theme = mode;
   }, [theme]);
+
+  useEffect(() => {
+    document.documentElement.dataset.reduceMotion = String(reduceMotion);
+  }, [reduceMotion]);
+
   return <>{children}</>;
 }
