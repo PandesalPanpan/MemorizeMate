@@ -1,0 +1,9 @@
+.header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); margin-bottom: var(--space-lg); flex-wrap: wrap; }
+.subtitle { color: var(--color-muted); margin-top: 4px; }
+.form { display: flex; gap: var(--space-sm); align-items: flex-end; margin-bottom: var(--space-lg); flex-wrap: wrap; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-md); }
+.empty {
+  text-align: center; padding: var(--space-2xl) var(--space-lg);
+  border: 2px dashed var(--color-line); border-radius: var(--radius-xl); color: var(--color-muted);
+}
+.empty h3 { color: var(--color-text); margin-bottom: 6px; }

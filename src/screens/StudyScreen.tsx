@@ -4,6 +4,7 @@ import { CardFlip } from '../components/CardFlip';
 import { store } from '../store/useStore';
 import { renderCloze, clozeIndices } from '../cloze/parser';
 import type { Card, Rating } from '../types/models';
+import styles from './StudyScreen.module.css';
 
 function front(card: Card): { q: string; a: string } {
   if (card.type === 'cloze') {
@@ -23,7 +24,14 @@ export function StudyScreen() {
   }, [deckId]);
 
   if (!queue) return <p>Loading…</p>;
-  if (queue.length === 0) return <section><h2>All done 🎉</h2><p>No more cards due right now.</p></section>;
+  if (queue.length === 0)
+    return (
+      <section className={styles.done}>
+        <div className={styles.emoji}>🎉</div>
+        <h2>All done</h2>
+        <p>No more cards due right now. Come back later.</p>
+      </section>
+    );
 
   const card = queue[0];
   const { q, a } = front(card);
@@ -35,7 +43,10 @@ export function StudyScreen() {
 
   return (
     <section>
-      <h2>Studying</h2>
+      <div className={styles.bar}>
+        <h2>Studying</h2>
+        <span className={styles.count}>{queue.length} left</span>
+      </div>
       <CardFlip question={q} answer={a} onGrade={onGrade} />
     </section>
   );

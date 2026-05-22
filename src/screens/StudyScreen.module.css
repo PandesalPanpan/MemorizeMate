@@ -1,0 +1,4 @@
+.bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-lg); }
+.count { font-family: var(--font-mono); color: var(--color-muted); }
+.done { text-align: center; padding: var(--space-2xl) var(--space-lg); }
+.done .emoji { font-size: 3rem; }

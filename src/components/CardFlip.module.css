@@ -1,0 +1,30 @@
+.wrap { display: flex; flex-direction: column; gap: var(--space-lg); max-width: 640px; margin: 0 auto; }
+.card {
+  position: relative;
+  min-height: 260px;
+  display: flex; flex-direction: column; gap: var(--space-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-xl);
+}
+.card::after {
+  content: ''; position: absolute; left: var(--space-xl); right: var(--space-xl); top: 92px; height: 1px; background: var(--color-line);
+}
+.prompt { font-size: var(--step-2); font-family: var(--font-display); line-height: 1.25; }
+.answer { font-size: var(--step-1); color: var(--color-accent-deep); padding-top: var(--space-md); border-top: 1px solid var(--color-line); }
+.grades { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-sm); }
+.grade {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 14px 8px; border-radius: var(--radius-md);
+  border: 1px solid var(--color-line); background: var(--color-surface);
+  font-weight: 700; color: var(--color-text);
+  transition: transform var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease), color var(--motion-fast) var(--ease);
+}
+.grade:hover { transform: translateY(-2px); }
+.grade .key { font-size: var(--step--2); font-family: var(--font-mono); color: var(--color-muted); font-weight: 500; }
+.again:hover { background: var(--color-again); color: #fff; border-color: transparent; }
+.hard:hover { background: var(--color-hard); color: #fff; border-color: transparent; }
+.good:hover { background: var(--color-good); color: #fff; border-color: transparent; }
+.easy:hover { background: var(--color-easy); color: #fff; border-color: transparent; }

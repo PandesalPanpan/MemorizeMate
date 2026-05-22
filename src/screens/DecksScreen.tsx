@@ -1,6 +1,9 @@
 import { useState } from 'react';
-import { DeckCard } from '../components/DeckCard';
 import { useStore, store } from '../store/useStore';
+import { DeckCard } from '../components/DeckCard';
+import { Button } from '../components/ui/Button';
+import { Field } from '../components/ui/Field';
+import styles from './DecksScreen.module.css';
 
 export function DecksScreen() {
   const decks = useStore((s) => s.decks);
@@ -17,22 +20,37 @@ export function DecksScreen() {
 
   return (
     <section>
-      <h2>Decks</h2>
-      <button onClick={() => setOpen(true)} style={{ background: 'var(--color-accent)', color: 'white', border: 'none', borderRadius: 'var(--radius-md)', padding: '8px 16px' }}>
-        + New deck
-      </button>
+      <div className={styles.header}>
+        <div>
+          <h2>Decks</h2>
+          <p className={styles.subtitle}>{decks.length} {decks.length === 1 ? 'deck' : 'decks'}</p>
+        </div>
+        <Button onClick={() => setOpen((v) => !v)}>+ New deck</Button>
+      </div>
+
       {open && (
-        <form onSubmit={create} style={{ marginTop: 16 }}>
-          <label htmlFor="deckName">Deck name</label>
-          <input id="deckName" value={name} onChange={(e) => setName(e.target.value)} autoFocus />
-          <button type="submit">Create</button>
+        <form className={styles.form} onSubmit={create}>
+          <div style={{ flex: 1, minWidth: 200 }}>
+            <Field label="Deck name" htmlFor="deckName">
+              <input id="deckName" value={name} onChange={(e) => setName(e.target.value)} autoFocus />
+            </Field>
+          </div>
+          <Button type="submit">Create</Button>
         </form>
       )}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 16, marginTop: 16 }}>
-        {decks.map((d) => (
-          <DeckCard key={d.id} deck={d} onDelete={(id) => store.getState().removeDeck(id)} />
-        ))}
-      </div>
+
+      {decks.length === 0 ? (
+        <div className={styles.empty}>
+          <h3>No decks yet</h3>
+          <p>Create your first deck to start memorizing.</p>
+        </div>
+      ) : (
+        <div className={styles.grid}>
+          {decks.map((d) => (
+            <DeckCard key={d.id} deck={d} onDelete={(id) => store.getState().removeDeck(id)} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }
