@@ -1,0 +1,22 @@
+.shell { min-height: 100%; }
+.main {
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-lg) calc(var(--bottomnav-h) + var(--space-2xl));
+}
+.topbar {
+  position: sticky; top: 0; z-index: 15;
+  display: flex; align-items: center; justify-content: space-between;
+  height: var(--topbar-h);
+  padding: 0 var(--space-md);
+  background: color-mix(in oklab, var(--color-bg) 88%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--color-line);
+}
+.topword { font-family: var(--font-display); font-weight: 600; font-size: 1.1rem; }
+.topword span { color: var(--color-accent); }
+
+/* Desktop: offset content for sidebar */
+.withSidebar { padding-left: var(--sidebar-w); }
+.withSidebar .main { padding-bottom: var(--space-2xl); }
