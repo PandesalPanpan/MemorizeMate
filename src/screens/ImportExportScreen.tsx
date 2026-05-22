@@ -2,6 +2,9 @@ import { useMemo, useState } from 'react';
 import { parseImport } from '../importer/parser';
 import { toJSON, toCSV } from '../exporter/exporter';
 import { useStore, store } from '../store/useStore';
+import { Button } from '../components/ui/Button';
+import { Field } from '../components/ui/Field';
+import styles from './ImportExportScreen.module.css';
 
 export function ImportExportScreen() {
   const decks = useStore((s) => s.decks);
@@ -24,29 +27,52 @@ export function ImportExportScreen() {
     const blob = new Blob([data], { type: kind === 'json' ? 'application/json' : 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `memorizemate.${kind}`; a.click();
+    a.href = url;
+    a.download = `memorizemate.${kind}`;
+    a.click();
     URL.revokeObjectURL(url);
   }
 
   return (
     <section>
-      <h2>Import / Export</h2>
-      <label htmlFor="deck">Into deck</label>
-      <select id="deck" value={target} onChange={(e) => setDeckId(e.target.value)}>
-        {decks.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
-      </select>
+      <h2>Import &amp; Export</h2>
 
-      <label htmlFor="paste">Paste cards (CSV, Front | Back, or cloze)</label>
-      <textarea id="paste" rows={6} value={raw} onChange={(e) => setRaw(e.target.value)} style={{ width: '100%' }} />
+      <Field label="Into deck" htmlFor="deck">
+        <select id="deck" value={target} onChange={(e) => setDeckId(e.target.value)}>
+          {decks.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
+        </select>
+      </Field>
+
+      <Field label="Paste cards (CSV, Front | Back, or cloze)" htmlFor="paste">
+        <textarea id="paste" className={styles.textarea} value={raw} onChange={(e) => setRaw(e.target.value)} />
+      </Field>
 
       {result.cards.length > 0 && (
-        <p>{result.cards.length} cards detected — format: {result.format}</p>
+        <>
+          <div className={styles.statusRow}>
+            <strong>{result.cards.length} cards detected</strong>
+            <span className={styles.badge}>format: {result.format}</span>
+          </div>
+          <div className={styles.preview}>
+            {result.cards.slice(0, 50).map((c, i) => (
+              <div key={i} className={styles.row}>
+                <span className={styles.q}>{c.front}</span>
+                {c.back && <span className={styles.a}>— {c.back}</span>}
+              </div>
+            ))}
+          </div>
+        </>
       )}
-      <button onClick={doImport} disabled={!result.cards.length}>Import</button>
+
+      <Button onClick={doImport} disabled={!result.cards.length}>Import</Button>
+
+      <hr className={styles.divider} />
 
       <h3>Export backup</h3>
-      <button onClick={() => download('json')}>Export JSON</button>
-      <button onClick={() => download('csv')}>Export CSV</button>
+      <div className={styles.exportRow}>
+        <Button variant="outline" onClick={() => download('json')}>Export JSON</Button>
+        <Button variant="outline" onClick={() => download('csv')}>Export CSV</Button>
+      </div>
     </section>
   );
 }

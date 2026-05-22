@@ -1,0 +1,10 @@
+.textarea { width: 100%; min-height: 150px; resize: vertical; padding: 14px; font-family: var(--font-mono); font-size: var(--step--1); background: var(--color-bg); border: 1px solid var(--color-line); border-radius: var(--radius-md); }
+.textarea:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-wash); }
+.statusRow { display: flex; align-items: center; gap: var(--space-sm); margin: var(--space-sm) 0 var(--space-md); }
+.badge { font-family: var(--font-mono); font-size: var(--step--2); background: var(--color-accent-wash); color: var(--color-accent-deep); padding: 3px 10px; border-radius: var(--radius-pill); }
+.preview { display: flex; flex-direction: column; gap: 6px; max-height: 240px; overflow: auto; margin-bottom: var(--space-md); }
+.row { display: flex; gap: 10px; padding: 8px 12px; border: 1px solid var(--color-line); border-radius: var(--radius-md); background: var(--color-surface); }
+.q { font-weight: 600; }
+.a { color: var(--color-muted); }
+.exportRow { display: flex; gap: var(--space-sm); flex-wrap: wrap; margin-top: var(--space-sm); }
+.divider { height: 1px; background: var(--color-line); border: none; margin: var(--space-xl) 0; }

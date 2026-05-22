@@ -1,8 +1,10 @@
 import { useRef } from 'react';
-import { wrapSelection, nextClozeIndex } from '../cloze/parser';
+import { wrapSelection, nextClozeIndex, clozeIndices } from '../cloze/parser';
+import styles from './ClozeEditor.module.css';
 
 export function ClozeEditor({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const ref = useRef<HTMLTextAreaElement>(null);
+  const count = clozeIndices(value).length;
 
   function makeCloze() {
     const ta = ref.current;
@@ -13,19 +15,26 @@ export function ClozeEditor({ value, onChange }: { value: string; onChange: (v: 
   }
 
   return (
-    <div>
+    <div className={styles.editor}>
       <textarea
         ref={ref}
+        className={styles.textarea}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        rows={4}
-        style={{ width: '100%', fontFamily: 'var(--font-body)', padding: 8, borderRadius: 'var(--radius-md)' }}
+        placeholder="Type text, select a phrase, then press “Make cloze”…"
       />
-      <button type="button" onClick={makeCloze}
-        style={{ marginTop: 8, background: 'var(--color-accent-soft)', border: 'none', borderRadius: 'var(--radius-pill, 999px)', padding: '6px 14px' }}>
-        Make cloze
-      </button>
-      <p style={{ color: 'var(--color-muted)', fontSize: 12 }}>Select text, then "Make cloze" — works on desktop and mobile.</p>
+      <div className={styles.toolbar}>
+        <button type="button" className={styles.makeBtn} onClick={makeCloze}>
+          ✂︎ Make cloze
+        </button>
+        <span className={styles.hint}>Select text, then tap — works on desktop and mobile.</span>
+      </div>
+      {count > 0 && (
+        <div className={styles.preview}>
+          <div className={styles.previewLabel}>{count} cloze {count === 1 ? 'deletion' : 'deletions'}</div>
+          <code className={styles.chip}>{`{{c${count}::…}}`}</code>
+        </div>
+      )}
     </div>
   );
 }
