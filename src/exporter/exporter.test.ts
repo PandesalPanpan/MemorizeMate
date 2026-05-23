@@ -4,7 +4,7 @@ import type { Deck, Card } from '../types/models';
 import { newCard } from '../fsrs/scheduler';
 
 const deck: Deck = {
-  id: 'd1', name: 'Bio', description: '', color: 'accent', icon: '🧬',
+  id: 'd1', name: 'Bio', description: '', color: 'terracotta', icon: '🧬',
   desiredRetention: 0.9, createdAt: 0,
 };
 const card: Card = {

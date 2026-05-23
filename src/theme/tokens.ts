@@ -1,3 +1,5 @@
+import { deckColorVars } from './deckColors';
+
 export const tokens = {
   color: {
     // guaranteed by tokens.test.ts — DO NOT change these three:
@@ -96,5 +98,6 @@ export function cssVars(mode: ThemeMode): Record<string, string> {
     '--motion-slow': tokens.motion.slow,
     '--ease': tokens.motion.ease,
     '--spring': tokens.motion.spring,
+    ...deckColorVars(mode),
   };
 }

@@ -47,7 +47,7 @@ export function createStore(repo: Repository = defaultRepo) {
     async createDeck({ name, description }) {
       try {
         const deck: Deck = {
-          id: id(), name, description, color: 'accent', icon: '📘',
+          id: id(), name, description, color: 'terracotta', icon: '📘',
           desiredRetention: 0.9, createdAt: Date.now(),
         };
         await get().repo.putDeck(deck);
