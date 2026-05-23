@@ -1,18 +1,18 @@
 import { describe, it, expect } from 'vitest';
 import { resolveLives, loseLife, endSession, manualUnlock, isLocked, secondsToRefill } from './livesMachine';
-import { INITIAL_LIVES } from '../types/models';
+import { INITIAL_LIVES, LIVES_REFILL_MS } from '../types/models';
 
 const T0 = 1_000_000;
 
 describe('lives machine', () => {
-  it('refills to full once 10 minutes have passed since lastEventAt', () => {
+  it('refills to full once the refill window has passed since lastEventAt', () => {
     const stale = { current: 0, lastEventAt: T0 };
-    const r = resolveLives(stale, T0 + 10 * 60 * 1000);
+    const r = resolveLives(stale, T0 + LIVES_REFILL_MS);
     expect(r.current).toBe(INITIAL_LIVES);
   });
 
-  it('does not refill before 10 minutes', () => {
-    const r = resolveLives({ current: 2, lastEventAt: T0 }, T0 + 60 * 1000);
+  it('does not refill before the refill window', () => {
+    const r = resolveLives({ current: 2, lastEventAt: T0 }, T0 + LIVES_REFILL_MS - 1);
     expect(r.current).toBe(2);
   });
 
@@ -38,10 +38,18 @@ describe('lives machine', () => {
 
   it('isLocked is true only at 0 lives after resolving', () => {
     expect(isLocked({ current: 0, lastEventAt: T0 }, T0 + 1000)).toBe(true);
-    expect(isLocked({ current: 0, lastEventAt: T0 }, T0 + 10 * 60 * 1000)).toBe(false);
+    expect(isLocked({ current: 0, lastEventAt: T0 }, T0 + LIVES_REFILL_MS)).toBe(false);
+  });
+
+  it('does not overwrite a full state even after the refill window', () => {
+    const r = resolveLives({ current: INITIAL_LIVES, lastEventAt: T0 }, T0 + LIVES_REFILL_MS);
+    expect(r.current).toBe(INITIAL_LIVES);
+    expect(r).toEqual({ current: INITIAL_LIVES, lastEventAt: T0 }); // identity preserved
   });
 
   it('secondsToRefill counts down', () => {
-    expect(secondsToRefill({ current: 0, lastEventAt: T0 }, T0 + 60 * 1000)).toBe(540);
+    const elapsed = 60_000; // 1 min into a 10-min lockout
+    const expected = Math.ceil((LIVES_REFILL_MS - elapsed) / 1000);
+    expect(secondsToRefill({ current: 0, lastEventAt: T0 }, T0 + elapsed)).toBe(expected);
   });
 });

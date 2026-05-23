@@ -1,8 +1,9 @@
 import { INITIAL_LIVES, LIVES_REFILL_MS, type LivesState } from '../types/models';
 
-/** Apply time-based refill: if the refill window elapsed since lastEventAt, lives are full. */
+/** Apply time-based refill: if the refill window elapsed since lastEventAt, lives are full.
+ *  Does NOT advance lastEventAt on refill (the timer is for lockout, not cadence). */
 export function resolveLives(state: LivesState, now: number): LivesState {
-  if (now - state.lastEventAt >= LIVES_REFILL_MS) {
+  if (state.current < INITIAL_LIVES && now - state.lastEventAt >= LIVES_REFILL_MS) {
     return { current: INITIAL_LIVES, lastEventAt: state.lastEventAt };
   }
   return state;
