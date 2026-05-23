@@ -23,6 +23,56 @@
 
 # PART 0 — Shared foundation
 
+## Task 0: Change the dev server port to 5174
+
+The user runs another project on the default Vite port (5173); MemorizeMate's dev server must default to **5174** to avoid the clash. (Playwright uses its own port 5180, set in Task 23 — leave that as-is.)
+
+**Files:**
+- Modify: `vite.config.ts`, `.env.example`, `docker-compose.yml`
+
+- [ ] **Step 1: Set the Vite dev port**
+
+In `vite.config.ts`, find the `server` block (added in the Phase 1 Docker task) and change the port from `5173` to `5174`. The block should read:
+```ts
+  server: { host: true, port: 5174, watch: { usePolling: true } },
+  preview: { host: true, port: 4173 },
+```
+> If no `server` block exists, add the two lines above to the config object passed to `defineConfig`.
+
+- [ ] **Step 2: Update the env sample**
+
+In `.env.example`, change the dev-port line to:
+```bash
+DEV_PORT=5174
+```
+
+- [ ] **Step 3: Update docker-compose dev mapping**
+
+In `docker-compose.yml`, update the `dev` service so the host/container ports and default match 5174:
+```yaml
+    ports:
+      - "${DEV_PORT:-5174}:5174"
+```
+And update the dev command/exposed port if it hardcodes 5173. In `Dockerfile.dev`, change `EXPOSE 5173` to `EXPOSE 5174` and the start command to bind 5174:
+```dockerfile
+EXPOSE 5174
+CMD ["npm", "run", "dev", "--", "--host", "--port", "5174"]
+```
+
+- [ ] **Step 4: Verify**
+
+Run: `npm run build`
+Expected: build succeeds. (Optionally `npm run dev` and confirm it serves on `http://localhost:5174`.)
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add vite.config.ts .env.example docker-compose.yml Dockerfile.dev
+git commit -m "chore: default dev server to port 5174 to avoid clash with another project"
+```
+
+---
+
 ## Task 1: Extend domain types (ExamAttempt, LivesState, deck colors)
 
 **Files:**
@@ -658,59 +708,64 @@ Remove the old `createDeck` signature line and replace with the new one above.
 
 (c) Add `lives: { current: INITIAL_LIVES, lastEventAt: 0 }` to the initial state object (next to `decks: []`).
 
-(d) Replace the `createDeck` implementation:
+> IMPORTANT — match the existing code style: the current `useStore.ts` accesses the repository via **`get().repo`** (not a closure variable) and wraps actions in `try { … } catch (e) { get()._setError(e); throw e; }`. Keep that pattern in all edits below. There is also an existing `error: string | null` field and `_setError` action — leave them intact.
+
+(d) Replace the existing `createDeck` implementation (which currently sets `color: 'accent', icon: '📘'`) with one that takes a color and drops the emoji:
 ```ts
     async createDeck({ name, description, color }) {
-      const deck: Deck = {
-        id: id(), name, description, color,
-        desiredRetention: 0.9, createdAt: Date.now(),
-      };
-      await repo.putDeck(deck);
-      set({ decks: [...get().decks, deck] });
-      return deck;
+      try {
+        const deck: Deck = {
+          id: id(), name, description, color,
+          desiredRetention: 0.9, createdAt: Date.now(),
+        };
+        await get().repo.putDeck(deck);
+        set({ decks: [...get().decks, deck] });
+        return deck;
+      } catch (e) { get()._setError(e); throw e; }
     },
 ```
 
 (e) Add the new actions inside the returned object (after `reviewCard`):
 ```ts
     async updateCard(card) {
-      await repo.putCard(card);
+      try { await get().repo.putCard(card); } catch (e) { get()._setError(e); throw e; }
     },
     async deleteCard(cardId) {
-      await repo.deleteCard(cardId);
+      try { await get().repo.deleteCard(cardId); } catch (e) { get()._setError(e); throw e; }
     },
     async loadLives(now = Date.now()) {
-      const stored = await repo.getLives();
-      const resolved = resolveLives(stored, now);
-      set({ lives: resolved });
+      try {
+        const stored = await get().repo.getLives();
+        set({ lives: resolveLives(stored, now) });
+      } catch (e) { get()._setError(e); }
     },
     async loseLife(now = Date.now()) {
       const next = loseLifeFn(get().lives, now);
-      await repo.putLives(next);
+      await get().repo.putLives(next);
       set({ lives: next });
     },
     async endSession(now = Date.now()) {
       const next = endSessionFn(get().lives, now);
-      await repo.putLives(next);
+      await get().repo.putLives(next);
       set({ lives: next });
     },
     async manualUnlock(now = Date.now()) {
       const next = unlockFn(now);
-      await repo.putLives(next);
+      await get().repo.putLives(next);
       set({ lives: next });
     },
     async finishExam(deckId, results, now = Date.now()) {
-      await repo.addExamAttempt({ id: id(), deckId, timestamp: now, results, score: scoreAttempt(results) });
+      await get().repo.addExamAttempt({ id: id(), deckId, timestamp: now, results, score: scoreAttempt(results) });
     },
 ```
 
-(f) In `reviewCard`, after writing the review log, lose a life on an "Again" rating:
+(f) In `reviewCard`, inside the existing `try` block and **after** the `addReviewLog(...)` call, lose a life on an "Again" rating:
 ```ts
-      if (rating === 'again') {
-        const next = loseLifeFn(get().lives, now.getTime());
-        await repo.putLives(next);
-        set({ lives: next });
-      }
+        if (rating === 'again') {
+          const next = loseLifeFn(get().lives, now.getTime());
+          await get().repo.putLives(next);
+          set({ lives: next });
+        }
 ```
 
 - [ ] **Step 4: Run to verify pass**
