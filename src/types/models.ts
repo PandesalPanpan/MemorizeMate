@@ -8,12 +8,38 @@ export function isRating(v: unknown): v is Rating {
 
 export type CardType = 'basic' | 'cloze';
 
+export const DECK_COLORS = ['terracotta', 'sage', 'slate', 'ochre', 'plum', 'indigo'] as const;
+export type DeckColor = (typeof DECK_COLORS)[number];
+export function isDeckColor(v: unknown): v is DeckColor {
+  return typeof v === 'string' && (DECK_COLORS as readonly string[]).includes(v);
+}
+
+export const INITIAL_LIVES = 10;
+export const LIVES_REFILL_MS = 10 * 60 * 1000; // 10 minutes
+
+export interface LivesState {
+  current: number;      // 0..INITIAL_LIVES
+  lastEventAt: number;  // epoch ms of last wipe-out OR session end
+}
+
+export interface ExamResult {
+  cardId: string;
+  correct: boolean;
+}
+export interface ExamAttempt {
+  id: string;
+  deckId: string;
+  timestamp: number;
+  results: ExamResult[];
+  score: number;        // 0..1
+}
+
 export interface Deck {
   id: string;
   name: string;
   description: string;
-  color: string;       // token key or hex
-  icon: string;        // emoji or icon name
+  color: DeckColor;
+  icon?: string;        // emoji or icon name
   desiredRetention: number; // 0.7 - 0.97
   createdAt: number;   // epoch ms
 }
@@ -49,6 +75,7 @@ export interface Settings {
   theme: 'light' | 'dark' | 'auto';
   soundEnabled: boolean;
   reduceMotion: boolean;
+  sidebarCollapsed: boolean;
   notifications: NotificationSettings;
 }
 
@@ -56,5 +83,6 @@ export const DEFAULT_SETTINGS: Settings = {
   theme: 'auto',
   soundEnabled: true,
   reduceMotion: false,
+  sidebarCollapsed: false,
   notifications: { enabled: false, reminderHour: 9 },
 };
