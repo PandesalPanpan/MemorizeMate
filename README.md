@@ -21,7 +21,7 @@ A PWA flashcard app built with React, TypeScript, and Vite.
 ```bash
 cp .env.example .env
 npm install
-npm run dev        # Vite dev server on :5173
+npm run dev        # Vite dev server on :5174
 npm test           # vitest (38 tests)
 npm run build      # type-check + production build
 ```
