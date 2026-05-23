@@ -1,10 +1,11 @@
 import type { IDBPDatabase } from 'idb';
 import { openMMDB, type MMDB } from './db';
 import type { Repository } from './repository';
-import type { Deck, Card, ReviewLog, Settings } from '../types/models';
-import { DEFAULT_SETTINGS } from '../types/models';
+import type { Deck, Card, ReviewLog, Settings, ExamAttempt, LivesState } from '../types/models';
+import { DEFAULT_SETTINGS, INITIAL_LIVES } from '../types/models';
 
 const SETTINGS_KEY = 'app';
+const LIVES_KEY = 'lives';
 
 export class IndexedDbRepository implements Repository {
   private dbp: Promise<IDBPDatabase<MMDB>>;
@@ -53,11 +54,25 @@ export class IndexedDbRepository implements Repository {
   }
 
   async getSettings(): Promise<Settings> {
-    const s = await (await this.dbp).get('settings', SETTINGS_KEY);
+    const s = await (await this.dbp).get('settings', SETTINGS_KEY) as Settings | undefined;
     return s ?? DEFAULT_SETTINGS;
   }
   async putSettings(settings: Settings): Promise<void> {
-    await (await this.dbp).put('settings', settings, SETTINGS_KEY);
+    await (await this.dbp).put('settings', settings as Settings | LivesState, SETTINGS_KEY);
+  }
+
+  async addExamAttempt(attempt: ExamAttempt): Promise<void> {
+    await (await this.dbp).put('examAttempts', attempt);
+  }
+  async listExamAttempts(deckId: string): Promise<ExamAttempt[]> {
+    return (await this.dbp).getAllFromIndex('examAttempts', 'byDeck', deckId);
+  }
+  async getLives(): Promise<LivesState> {
+    const v = (await (await this.dbp).get('settings', LIVES_KEY)) as LivesState | undefined;
+    return v ?? { current: INITIAL_LIVES, lastEventAt: Date.now() };
+  }
+  async putLives(lives: LivesState): Promise<void> {
+    await (await this.dbp).put('settings', lives, LIVES_KEY);
   }
 
   async importBackup(decks: Deck[], cards: Card[]): Promise<void> {

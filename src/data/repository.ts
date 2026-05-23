@@ -1,4 +1,4 @@
-import type { Deck, Card, ReviewLog, Settings } from '../types/models';
+import type { Deck, Card, ReviewLog, Settings, ExamAttempt, LivesState } from '../types/models';
 
 export interface Repository {
   // decks
@@ -20,6 +20,14 @@ export interface Repository {
   // settings
   getSettings(): Promise<Settings>;
   putSettings(settings: Settings): Promise<void>;
+
+  // exam attempts
+  addExamAttempt(attempt: ExamAttempt): Promise<void>;
+  listExamAttempts(deckId: string): Promise<ExamAttempt[]>;
+
+  // lives
+  getLives(): Promise<LivesState>;
+  putLives(lives: LivesState): Promise<void>;
 
   // bulk (import/restore)
   importBackup(decks: Deck[], cards: Card[]): Promise<void>;
