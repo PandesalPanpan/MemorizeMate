@@ -2,8 +2,10 @@ import { createStore as createZustand, useStore as useZustand } from 'zustand';
 import type { Repository } from '../data/repository';
 import { repository as defaultRepo } from '../data/indexeddb-repository';
 import { newCard, grade, isDue } from '../fsrs/scheduler';
-import type { Deck, Card, Rating, Settings } from '../types/models';
-import { DEFAULT_SETTINGS } from '../types/models';
+import type { Deck, Card, Rating, Settings, LivesState, ExamResult, DeckColor } from '../types/models';
+import { DEFAULT_SETTINGS, INITIAL_LIVES } from '../types/models';
+import { loseLife as loseLifeFn, manualUnlock as unlockFn, endSession as endSessionFn, resolveLives } from '../lives/livesMachine';
+import { scoreAttempt } from '../exam/examLogic';
 
 const LEECH_THRESHOLD = 8;
 const id = () => crypto.randomUUID();
@@ -15,13 +17,21 @@ export interface StoreState {
   error: string | null;
   _setError(e: unknown): void;
   load(): Promise<void>;
-  createDeck(input: { name: string; description: string }): Promise<Deck>;
+  createDeck(input: { name: string; description: string; color: DeckColor }): Promise<Deck>;
   updateDeck(deck: Deck): Promise<void>;
   removeDeck(deckId: string): Promise<void>;
   addCard(input: { deckId: string; type: Card['type']; front: string; back: string; tags: string[] }): Promise<Card>;
   dueCards(deckId: string, now: Date): Promise<Card[]>;
   reviewCard(cardId: string, rating: Rating, now: Date): Promise<void>;
+  updateCard(card: Card): Promise<void>;
+  deleteCard(cardId: string): Promise<void>;
   updateSettings(patch: Partial<Settings>): Promise<void>;
+  lives: LivesState;
+  loadLives(now?: number): Promise<void>;
+  loseLife(now?: number): Promise<void>;
+  endSession(now?: number): Promise<void>;
+  manualUnlock(now?: number): Promise<void>;
+  finishExam(deckId: string, results: ExamResult[], now?: number): Promise<void>;
 }
 
 export function createStore(repo: Repository = defaultRepo) {
@@ -30,6 +40,7 @@ export function createStore(repo: Repository = defaultRepo) {
     decks: [],
     settings: DEFAULT_SETTINGS,
     error: null,
+    lives: { current: INITIAL_LIVES, lastEventAt: 0 },
 
     _setError(e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
@@ -44,10 +55,10 @@ export function createStore(repo: Repository = defaultRepo) {
       } catch (e) { get()._setError(e); }
     },
 
-    async createDeck({ name, description }) {
+    async createDeck({ name, description, color }) {
       try {
         const deck: Deck = {
-          id: id(), name, description, color: 'terracotta', icon: '📘',
+          id: id(), name, description, color,
           desiredRetention: 0.9, createdAt: Date.now(),
         };
         await get().repo.putDeck(deck);
@@ -106,7 +117,49 @@ export function createStore(repo: Repository = defaultRepo) {
           id: id(), cardId, timestamp: now.getTime(), rating,
           elapsedDays: log.elapsedDays, scheduledDays: log.scheduledDays,
         });
+        if (rating === 'again') {
+          const next = loseLifeFn(get().lives, now.getTime());
+          await get().repo.putLives(next);
+          set({ lives: next });
+        }
       } catch (e) { get()._setError(e); throw e; }
+    },
+
+    async updateCard(card) {
+      try { await get().repo.putCard(card); } catch (e) { get()._setError(e); throw e; }
+    },
+
+    async deleteCard(cardId) {
+      try { await get().repo.deleteCard(cardId); } catch (e) { get()._setError(e); throw e; }
+    },
+
+    async loadLives(now = Date.now()) {
+      try {
+        const stored = await get().repo.getLives();
+        set({ lives: resolveLives(stored, now) });
+      } catch (e) { get()._setError(e); }
+    },
+
+    async loseLife(now = Date.now()) {
+      const next = loseLifeFn(get().lives, now);
+      await get().repo.putLives(next);
+      set({ lives: next });
+    },
+
+    async endSession(now = Date.now()) {
+      const next = endSessionFn(get().lives, now);
+      await get().repo.putLives(next);
+      set({ lives: next });
+    },
+
+    async manualUnlock(now = Date.now()) {
+      const next = unlockFn(now);
+      await get().repo.putLives(next);
+      set({ lives: next });
+    },
+
+    async finishExam(deckId, results, now = Date.now()) {
+      await get().repo.addExamAttempt({ id: id(), deckId, timestamp: now, results, score: scoreAttempt(results) });
     },
   }));
 }
