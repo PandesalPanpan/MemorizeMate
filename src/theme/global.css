@@ -22,6 +22,7 @@
   /* Layout */
   --content-max: 920px;
   --sidebar-w: 240px;
+  --sidebar-collapsed-w: 72px;
   --bottomnav-h: 68px;
   --topbar-h: 56px;
 }

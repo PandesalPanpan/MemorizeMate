@@ -4,19 +4,19 @@ import type { ReactNode } from 'react';
 import { useMediaQuery } from '../lib/useMediaQuery';
 import { Sidebar } from './nav/Sidebar';
 import { BottomNav } from './nav/BottomNav';
+import { useStore, store } from '../store/useStore';
 import styles from './Layout.module.css';
 
 export function Layout({ fab }: { fab?: ReactNode }) {
   const isDesktop = useMediaQuery('(min-width: 900px)');
+  const collapsed = useStore((s) => s.settings.sidebarCollapsed);
   return (
-    <div className={`${styles.shell} ${isDesktop ? styles.withSidebar : ''}`}>
+    <div className={`${styles.shell} ${isDesktop ? (collapsed ? styles.withRail : styles.withSidebar) : ''}`}>
       {isDesktop ? (
-        <Sidebar />
+        <Sidebar collapsed={collapsed} onToggle={() => store.getState().updateSettings({ sidebarCollapsed: !collapsed })} />
       ) : (
         <header className={styles.topbar}>
-          <span className={styles.topword}>
-            Memorize<span>Mate</span>
-          </span>
+          <span className={styles.topword}>Memorize<span>Mate</span></span>
         </header>
       )}
       <motion.main

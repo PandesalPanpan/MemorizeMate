@@ -20,3 +20,5 @@
 /* Desktop: offset content for sidebar */
 .withSidebar { padding-left: var(--sidebar-w); }
 .withSidebar .main { padding-bottom: var(--space-2xl); }
+.withRail { padding-left: var(--sidebar-collapsed-w); }
+.withRail .main { padding-bottom: var(--space-2xl); }

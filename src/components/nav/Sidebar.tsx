@@ -1,13 +1,14 @@
 import { NavLink } from 'react-router-dom';
+import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { NAV_ITEMS } from './navItems';
 import styles from './Sidebar.module.css';
 
-export function Sidebar() {
+export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
   return (
-    <aside className={styles.sidebar}>
+    <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ''}`}>
       <div className={styles.brand}>
         <span className={styles.mark}>✦</span>
-        <span className={styles.word}>MemorizeMate</span>
+        {!collapsed && <span className={styles.word}>MemorizeMate</span>}
       </div>
       <nav role="navigation" className={styles.nav}>
         {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
@@ -15,14 +16,21 @@ export function Sidebar() {
             key={to}
             to={to}
             end={to === '/'}
+            title={label}
             className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}
           >
             <Icon size={20} strokeWidth={1.75} />
-            <span>{label}</span>
+            {!collapsed && <span>{label}</span>}
           </NavLink>
         ))}
       </nav>
-      <p className={styles.footer}>Study, the slow way.</p>
+      <button
+        className={styles.toggle}
+        aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        onClick={onToggle}
+      >
+        {collapsed ? <PanelLeftOpen size={18} /> : <><PanelLeftClose size={18} /> <span>Collapse</span></>}
+      </button>
     </aside>
   );
 }
