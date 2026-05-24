@@ -1,4 +1,3 @@
-.head { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-sm); }
-.icon { font-size: 2.4rem; }
-.meta { color: var(--color-muted); margin-bottom: var(--space-lg); }
-.actions { display: flex; gap: var(--space-sm); flex-wrap: wrap; }
+.head { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-md); }
+.meta { color: var(--color-muted); margin-top: 2px; }
+.actions { display: flex; gap: var(--space-sm); flex-wrap: wrap; margin-bottom: var(--space-xl); }
