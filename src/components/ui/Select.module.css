@@ -1,0 +1,11 @@
+.field { display: flex; flex-direction: column; gap: 6px; }
+.label { font-weight: 600; font-size: var(--step--1); color: var(--color-text-soft); }
+.wrap { position: relative; }
+.select {
+  width: 100%; appearance: none; -webkit-appearance: none;
+  padding: 11px 38px 11px 14px;
+  background: var(--color-bg); color: var(--color-text);
+  border: 1px solid var(--color-line); border-radius: var(--radius-md);
+}
+.select:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-wash); }
+.chev { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--color-muted); }
