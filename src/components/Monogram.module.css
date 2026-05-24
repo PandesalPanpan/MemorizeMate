@@ -1,0 +1,6 @@
+.tile {
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-md); color: #fff;
+  font-family: var(--font-display); font-weight: 600; letter-spacing: 0.02em;
+  box-shadow: var(--shadow-card);
+}

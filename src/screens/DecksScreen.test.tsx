@@ -17,4 +17,13 @@ describe('DecksScreen', () => {
     await userEvent.click(screen.getByRole('button', { name: /create/i }));
     expect(await screen.findByText('Biology')).toBeInTheDocument();
   });
+
+  it('new decks render as a monogram (no emoji) and the whole card links to the deck', async () => {
+    render(<MemoryRouter><DecksScreen /></MemoryRouter>);
+    await userEvent.click(screen.getByRole('button', { name: /new deck/i }));
+    await userEvent.type(screen.getByLabelText(/deck name/i), 'Chemistry');
+    await userEvent.click(screen.getByRole('button', { name: /create/i }));
+    expect(await screen.findByText('CH')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /chemistry/i })).toBeInTheDocument();
+  });
 });
