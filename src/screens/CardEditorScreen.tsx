@@ -29,12 +29,14 @@ export function CardEditorScreen() {
   async function save(e: React.FormEvent) {
     e.preventDefault();
     if (!deckId) return;
-    if (existing) {
-      await store.getState().updateCard({ ...existing, type, front, back: type === 'cloze' ? '' : back });
-    } else {
-      await store.getState().addCard({ deckId, type, front, back: type === 'cloze' ? '' : back, tags: [] });
-    }
-    nav(`/decks/${deckId}`);
+    try {
+      if (existing) {
+        await store.getState().updateCard({ ...existing, type, front, back: type === 'cloze' ? '' : back });
+      } else {
+        await store.getState().addCard({ deckId, type, front, back: type === 'cloze' ? '' : back, tags: [] });
+      }
+      nav(`/decks/${deckId}`);
+    } catch { /* error already set in store */ }
   }
 
   return (
