@@ -4,6 +4,7 @@ import { toJSON, toCSV } from '../exporter/exporter';
 import { useStore, store } from '../store/useStore';
 import { Button } from '../components/ui/Button';
 import { Field } from '../components/ui/Field';
+import { Select } from '../components/ui/Select';
 import styles from './ImportExportScreen.module.css';
 
 export function ImportExportScreen() {
@@ -37,11 +38,13 @@ export function ImportExportScreen() {
     <section>
       <h2>Import &amp; Export</h2>
 
-      <Field label="Into deck" htmlFor="deck">
-        <select id="deck" value={target} onChange={(e) => setDeckId(e.target.value)}>
-          {decks.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
-        </select>
-      </Field>
+      <Select
+        id="deck"
+        label="Into deck"
+        value={target}
+        onChange={(v) => setDeckId(v)}
+        options={decks.map((d) => ({ value: d.id, label: d.name }))}
+      />
 
       <Field label="Paste cards (CSV, Front | Back, or cloze)" htmlFor="paste">
         <textarea id="paste" className={styles.textarea} value={raw} onChange={(e) => setRaw(e.target.value)} />

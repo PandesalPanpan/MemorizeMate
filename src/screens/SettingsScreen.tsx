@@ -1,4 +1,5 @@
 import { useStore, store } from '../store/useStore';
+import { Select } from '../components/ui/Select';
 import styles from './SettingsScreen.module.css';
 
 function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
@@ -20,12 +21,13 @@ export function SettingsScreen() {
       <div className={styles.group}>
         <div className={styles.groupTitle}>Appearance</div>
         <div className={styles.row}>
-          <label className={styles.rowLabel} htmlFor="theme">Theme</label>
-          <select id="theme" className={styles.select} value={settings.theme} onChange={(e) => set({ theme: e.target.value as 'light' | 'dark' | 'auto' })}>
-            <option value="auto">Auto</option>
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
-          </select>
+          <Select
+            id="theme"
+            label="Theme"
+            value={settings.theme}
+            onChange={(v) => set({ theme: v as 'light' | 'dark' | 'auto' })}
+            options={[{ value: 'auto', label: 'Auto' }, { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }]}
+          />
         </div>
         <div className={styles.row}>
           <span className={styles.rowLabel}>Reduce motion</span>
