@@ -8,7 +8,7 @@ import { IndexedDbRepository } from '../data/indexeddb-repository';
 
 async function seed() {
   store.setState({ repo: new IndexedDbRepository('study-' + Math.random()), decks: [] });
-  const deck = await store.getState().createDeck({ name: 'Bio', description: '' });
+  const deck = await store.getState().createDeck({ name: 'Bio', description: '', color: 'sage' });
   await store.getState().addCard({ deckId: deck.id, type: 'basic', front: 'Q', back: 'A', tags: [] });
   return deck.id;
 }

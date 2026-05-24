@@ -32,6 +32,7 @@ export function App() {
               <Route path="/decks/:deckId" element={<DeckDetailScreen />} />
               <Route path="/decks/:deckId/study" element={<StudyScreen />} />
               <Route path="/decks/:deckId/cards/new" element={<CardEditorScreen />} />
+              <Route path="/decks/:deckId/cards/:cardId" element={<CardEditorScreen />} />
               <Route path="/import" element={<ImportExportScreen />} />
               <Route path="/settings" element={<SettingsScreen />} />
             </Route>

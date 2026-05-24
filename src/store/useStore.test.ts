@@ -9,14 +9,14 @@ describe('store', () => {
   });
 
   it('creates a deck and reflects it in state', async () => {
-    await store.getState().createDeck({ name: 'Math', description: '' });
+    await store.getState().createDeck({ name: 'Math', description: '', color: 'sage' });
     expect(store.getState().decks).toHaveLength(1);
     expect(store.getState().decks[0].name).toBe('Math');
     expect(store.getState().decks[0].desiredRetention).toBe(0.9);
   });
 
   it('adds a basic card and lists due cards for a deck', async () => {
-    await store.getState().createDeck({ name: 'Math', description: '' });
+    await store.getState().createDeck({ name: 'Math', description: '', color: 'sage' });
     const deckId = store.getState().decks[0].id;
     await store.getState().addCard({ deckId, type: 'basic', front: '2+2', back: '4', tags: [] });
     const due = await store.getState().dueCards(deckId, new Date());
@@ -24,7 +24,7 @@ describe('store', () => {
   });
 
   it('reviewing a card with "good" removes it from due and writes a log', async () => {
-    await store.getState().createDeck({ name: 'Math', description: '' });
+    await store.getState().createDeck({ name: 'Math', description: '', color: 'sage' });
     const deckId = store.getState().decks[0].id;
     await store.getState().addCard({ deckId, type: 'basic', front: 'q', back: 'a', tags: [] });
     const now = new Date();

@@ -10,7 +10,7 @@ describe('ImportExportScreen', () => {
   let deckId = '';
   beforeEach(async () => {
     store.setState({ repo: new IndexedDbRepository('import-' + Math.random()), decks: [] });
-    const deck = await store.getState().createDeck({ name: 'Bio', description: '' });
+    const deck = await store.getState().createDeck({ name: 'Bio', description: '', color: 'sage' });
     deckId = deck.id;
   });
 

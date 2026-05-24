@@ -8,7 +8,7 @@ import { store } from '../store/useStore';
 describe('QuickAddFAB', () => {
   beforeEach(async () => {
     store.setState({ decks: [] });
-    await store.getState().createDeck({ name: 'Bio', description: '' });
+    await store.getState().createDeck({ name: 'Bio', description: '', color: 'sage' });
   });
 
   it('navigates to the most-recent deck card editor', async () => {
