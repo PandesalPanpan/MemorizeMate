@@ -1,5 +1,6 @@
 import { useStore, store } from '../store/useStore';
 import { Select } from '../components/ui/Select';
+import { requestPermission } from '../services/notifications';
 import styles from './SettingsScreen.module.css';
 
 function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
@@ -43,8 +44,22 @@ export function SettingsScreen() {
         </div>
         <div className={styles.row}>
           <span className={styles.rowLabel}>Daily review reminder</span>
-          <Toggle checked={settings.notifications.enabled} onChange={(v) => set({ notifications: { ...settings.notifications, enabled: v } })} />
+          <Toggle checked={settings.notifications.enabled} onChange={async (v) => {
+            if (v) await requestPermission();
+            set({ notifications: { ...settings.notifications, enabled: v } });
+          }} />
         </div>
+        {settings.notifications.enabled && (
+          <div className={styles.row}>
+            <Select
+              id="reminderHour"
+              label="Reminder time"
+              value={String(settings.notifications.reminderHour)}
+              onChange={(v) => set({ notifications: { ...settings.notifications, reminderHour: Number(v) } })}
+              options={Array.from({ length: 24 }, (_, h) => ({ value: String(h), label: `${String(h).padStart(2, '0')}:00` }))}
+            />
+          </div>
+        )}
       </div>
     </section>
   );
