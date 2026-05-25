@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { RATINGS, type Rating } from '../types/models';
+import { playCue } from '../services/sound';
+import { useStore } from '../store/useStore';
 import styles from './CardFlip.module.css';
 
 const META: Record<Rating, { label: string; key: string; cls: string }> = {
@@ -12,12 +14,17 @@ const META: Record<Rating, { label: string; key: string; cls: string }> = {
 
 export function CardFlip({ question, answer, onGrade }: { question: string; answer: string; onGrade: (r: Rating) => void }) {
   const [revealed, setRevealed] = useState(false);
+  const soundEnabled = useStore((s) => s.settings.soundEnabled);
 
-  const submit = useCallback((r: Rating) => { setRevealed(false); onGrade(r); }, [onGrade]);
+  const submit = useCallback((r: Rating) => {
+    playCue(r === 'again' ? 'wrong' : 'correct', { soundEnabled });
+    setRevealed(false);
+    onGrade(r);
+  }, [onGrade, soundEnabled]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (!revealed && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); setRevealed(true); return; }
+      if (!revealed && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); setRevealed(true); playCue('flip', { soundEnabled }); return; }
       if (revealed) {
         const r = RATINGS.find((x) => META[x].key === e.key);
         if (r) submit(r);
@@ -50,7 +57,7 @@ export function CardFlip({ question, answer, onGrade }: { question: string; answ
       </motion.div>
 
       {!revealed ? (
-        <button className={`${styles.grade} ${styles.good}`} style={{ padding: 16 }} onClick={() => setRevealed(true)}>
+        <button className={`${styles.grade} ${styles.good}`} style={{ padding: 16 }} onClick={() => { setRevealed(true); playCue('flip', { soundEnabled }); }}>
           Show answer <span className={styles.key}>space</span>
         </button>
       ) : (
