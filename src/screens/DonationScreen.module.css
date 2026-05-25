@@ -1,0 +1,6 @@
+.page { max-width: 460px; margin: 0 auto; text-align: center; padding: var(--space-xl) var(--space-lg); }
+.card { background: var(--color-surface); border: 1px solid var(--color-line); border-radius: var(--radius-lg); padding: var(--space-lg); margin: var(--space-lg) 0; }
+.label { color: var(--color-muted); font-size: var(--step--1); }
+.number { font-family: var(--font-mono); font-size: var(--step-2); color: var(--color-accent-deep); letter-spacing: 0.04em; }
+.actions { display: flex; flex-direction: column; gap: var(--space-sm); margin-top: var(--space-md); }
+.note { color: var(--color-muted); font-size: var(--step--1); margin-top: var(--space-md); }
