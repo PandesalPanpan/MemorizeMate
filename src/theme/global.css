@@ -8,8 +8,9 @@
   --step-1:  clamp(1.20rem, 1.10rem + 0.52vw, 1.56rem);
   --step-2:  clamp(1.44rem, 1.29rem + 0.74vw, 1.95rem);
   --step-3:  clamp(1.73rem, 1.52rem + 1.05vw, 2.44rem);
-  --step-4:  clamp(2.07rem, 1.78rem + 1.46vw, 3.05rem);
-  --step-5:  clamp(2.49rem, 2.08rem + 2.03vw, 3.82rem);
+  --step-4:  clamp(2.07rem, 1.70rem + 1.85vw, 3.50rem);
+  --step-5:  clamp(2.49rem, 1.95rem + 2.70vw, 4.60rem);
+  --step-6:  clamp(2.99rem, 2.20rem + 3.95vw, 5.80rem);
 
   /* Spacing scale */
   --space-xs: 4px;
@@ -57,15 +58,15 @@ body::before {
 
 h1, h2, h3, h4 {
   font-family: var(--font-display);
-  font-weight: 560;
-  line-height: 1.1;
-  letter-spacing: -0.01em;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
   color: var(--color-text);
   font-optical-sizing: auto;
 }
-h1 { font-size: var(--step-4); }
-h2 { font-size: var(--step-3); }
-h3 { font-size: var(--step-1); }
+h1 { font-size: var(--step-5); }
+h2 { font-size: var(--step-4); }
+h3 { font-size: var(--step-2); }
 
 p { line-height: 1.6; }
 a { color: var(--color-accent); text-decoration: none; }
