@@ -11,6 +11,9 @@ import { StudyScreen } from './screens/StudyScreen';
 import { CardEditorScreen } from './screens/CardEditorScreen';
 import { ImportExportScreen } from './screens/ImportExportScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
+import { ExamScreen } from './screens/ExamScreen';
+import { AIGenerateScreen } from './screens/AIGenerateScreen';
+import { DonationScreen } from './screens/DonationScreen';
 import { useStore, store } from './store/useStore';
 
 const Router = (import.meta as any).vitest ? MemoryRouter : BrowserRouter;
@@ -20,6 +23,7 @@ export function App() {
   const reduceMotion = useStore((s) => s.settings.reduceMotion);
   useEffect(() => {
     store.getState().load().catch(console.error);
+    store.getState().loadLives().catch(console.error);
   }, []);
   return (
     <ThemeProvider theme={theme} reduceMotion={reduceMotion}>
@@ -31,9 +35,12 @@ export function App() {
               <Route path="/decks" element={<DecksScreen />} />
               <Route path="/decks/:deckId" element={<DeckDetailScreen />} />
               <Route path="/decks/:deckId/study" element={<StudyScreen />} />
+              <Route path="/decks/:deckId/exam" element={<ExamScreen />} />
               <Route path="/decks/:deckId/cards/new" element={<CardEditorScreen />} />
               <Route path="/decks/:deckId/cards/:cardId" element={<CardEditorScreen />} />
               <Route path="/import" element={<ImportExportScreen />} />
+              <Route path="/generate" element={<AIGenerateScreen />} />
+              <Route path="/unlock" element={<DonationScreen />} />
               <Route path="/settings" element={<SettingsScreen />} />
             </Route>
           </Routes>

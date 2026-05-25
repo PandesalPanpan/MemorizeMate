@@ -1,0 +1,2 @@
+.wrap { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; background: var(--color-accent-wash); border-radius: var(--radius-pill); }
+.count { font-weight: 700; font-family: var(--font-mono); font-size: var(--step--1); }

@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { CardFlip } from '../components/CardFlip';
-import { store } from '../store/useStore';
+import { store, useStore } from '../store/useStore';
 import { renderCloze, clozeIndices } from '../cloze/parser';
+import { isLocked } from '../lives/livesMachine';
+import { LockoutScreen } from './LockoutScreen';
 import type { Card, Rating } from '../types/models';
 import styles from './StudyScreen.module.css';
 
@@ -17,7 +19,10 @@ function front(card: Card): { q: string; a: string } {
 
 export function StudyScreen() {
   const { deckId } = useParams();
+  const lives = useStore((s) => s.lives);
   const [queue, setQueue] = useState<Card[] | null>(null);
+
+  if (isLocked(lives, Date.now())) return <LockoutScreen />;
 
   useEffect(() => {
     if (deckId) store.getState().dueCards(deckId, new Date()).then(setQueue);

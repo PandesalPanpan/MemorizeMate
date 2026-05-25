@@ -16,6 +16,7 @@
 }
 .topword { font-family: var(--font-display); font-weight: 600; font-size: 1.1rem; }
 .topword span { color: var(--color-accent); }
+.deskLives { position: fixed; top: var(--space-md); right: var(--space-lg); z-index: 16; }
 
 /* Desktop: offset content for sidebar */
 .withSidebar { padding-left: var(--sidebar-w); }

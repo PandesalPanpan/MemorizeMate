@@ -1,0 +1,4 @@
+.page { max-width: 480px; margin: 0 auto; text-align: center; padding: var(--space-2xl) var(--space-lg); }
+.emoji { font-size: 3rem; }
+.timer { font-family: var(--font-mono); color: var(--color-accent-deep); font-size: var(--step-1); margin: var(--space-md) 0; }
+.actions { display: flex; gap: var(--space-sm); justify-content: center; flex-wrap: wrap; }
