@@ -23,7 +23,7 @@ Each card in the session queue gets a `step` counter (starts at 0) and an `avail
 | GOOD   | Advance step +1 | 10 minutes |
 | EASY   | Immediately graduate | — |
 
-**Graduation:** A card graduates (leaves the session) when its step reaches 3, or when rated EASY. Graduated cards get their normal FSRS long-term reschedule applied.
+**Graduation:** A card graduates (leaves the session) when its step reaches 3, or when rated EASY. Graduated cards get their normal FSRS long-term reschedule applied. Learning steps apply uniformly to all cards in the session — both new cards and review cards returning from prior days.
 
 **Queue logic:** The session loops through the queue, skipping cards whose `availableAt` is in the future. If all remaining cards are waiting on delays, the UI shows a brief "Next card in X:XX" countdown rather than ending the session. The session only ends when all cards have graduated.
 
