@@ -1,7 +1,7 @@
 import type { IDBPDatabase } from 'idb';
 import { openMMDB, type MMDB } from './db';
 import type { Repository } from './repository';
-import type { Deck, Card, ReviewLog, Settings, ExamAttempt, LivesState } from '../types/models';
+import type { Deck, Card, ReviewLog, Settings, ExamAttempt, LivesState, StudySession } from '../types/models';
 import { DEFAULT_SETTINGS, INITIAL_LIVES } from '../types/models';
 
 const SETTINGS_KEY = 'app';
@@ -67,6 +67,19 @@ export class IndexedDbRepository implements Repository {
   async listExamAttempts(deckId: string): Promise<ExamAttempt[]> {
     return (await this.dbp).getAllFromIndex('examAttempts', 'byDeck', deckId);
   }
+  async addSession(session: StudySession): Promise<void> {
+    await (await this.dbp).put('sessions', session);
+  }
+
+  async listSessions(): Promise<StudySession[]> {
+    return (await this.dbp).getAll('sessions');
+  }
+
+  async listReviewLogsByCard(cardId: string): Promise<ReviewLog[]> {
+    const all = await this.listReviewLogs();
+    return all.filter((l) => l.cardId === cardId);
+  }
+
   async getLives(): Promise<LivesState> {
     const v = (await (await this.dbp).get('settings', LIVES_KEY)) as LivesState | undefined;
     return v ?? { current: INITIAL_LIVES, lastEventAt: Date.now() };

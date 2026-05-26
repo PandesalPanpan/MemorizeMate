@@ -1,5 +1,5 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
-import type { Deck, Card, ReviewLog, Settings, ExamAttempt, LivesState } from '../types/models';
+import type { Deck, Card, ReviewLog, Settings, ExamAttempt, LivesState, StudySession } from '../types/models';
 import { DECK_COLORS } from '../types/models';
 
 export interface MMDB extends DBSchema {
@@ -8,10 +8,11 @@ export interface MMDB extends DBSchema {
   reviewLogs: { key: string; value: ReviewLog };
   settings: { key: string; value: Settings | LivesState };
   examAttempts: { key: string; value: ExamAttempt; indexes: { byDeck: string } };
+  sessions: { key: string; value: StudySession; indexes: { byDeck: string } };
 }
 
 export function openMMDB(name = 'memorizemate'): Promise<IDBPDatabase<MMDB>> {
-  return openDB<MMDB>(name, 2, {
+  return openDB<MMDB>(name, 3, {
     async upgrade(db, oldVersion, _newVersion, tx) {
       if (oldVersion < 1) {
         db.createObjectStore('decks', { keyPath: 'id' });
@@ -33,6 +34,10 @@ export function openMMDB(name = 'memorizemate'): Promise<IDBPDatabase<MMDB>> {
           }
           cursor = await cursor.continue();
         }
+      }
+      if (oldVersion < 3) {
+        const sessions = db.createObjectStore('sessions', { keyPath: 'id' });
+        sessions.createIndex('byDeck', 'deckIds', { multiEntry: true });
       }
     },
   });

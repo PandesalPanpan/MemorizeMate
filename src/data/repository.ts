@@ -1,4 +1,4 @@
-import type { Deck, Card, ReviewLog, Settings, ExamAttempt, LivesState } from '../types/models';
+import type { Deck, Card, ReviewLog, Settings, ExamAttempt, LivesState, StudySession } from '../types/models';
 
 export interface Repository {
   // decks
@@ -24,6 +24,13 @@ export interface Repository {
   // exam attempts
   addExamAttempt(attempt: ExamAttempt): Promise<void>;
   listExamAttempts(deckId: string): Promise<ExamAttempt[]>;
+
+  // sessions
+  addSession(session: StudySession): Promise<void>;
+  listSessions(): Promise<StudySession[]>;
+
+  // review logs by card
+  listReviewLogsByCard(cardId: string): Promise<ReviewLog[]>;
 
   // lives
   getLives(): Promise<LivesState>;
