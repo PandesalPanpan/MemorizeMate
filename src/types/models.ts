@@ -97,5 +97,7 @@ export const DEFAULT_SETTINGS: Settings = {
   soundEnabled: true,
   reduceMotion: false,
   sidebarCollapsed: false,
+  showTimer: false,
+  onboardingComplete: false,
   notifications: { enabled: false, reminderHour: 9 },
 };
