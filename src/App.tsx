@@ -15,6 +15,8 @@ import { ExamScreen } from './screens/ExamScreen';
 import { AIGenerateScreen } from './screens/AIGenerateScreen';
 import { DonationScreen } from './screens/DonationScreen';
 import { useStore, store } from './store/useStore';
+import { setBadge, scheduleReminder } from './services/notifications';
+import { isDue } from './fsrs/scheduler';
 
 const Router = (import.meta as any).vitest ? MemoryRouter : BrowserRouter;
 
@@ -24,6 +26,15 @@ export function App() {
   useEffect(() => {
     store.getState().load().catch(console.error);
     store.getState().loadLives().catch(console.error);
+    (async () => {
+      const cards = await store.getState().repo.listCards();
+      const due = cards.filter((c) => isDue(c.srs, new Date())).length;
+      setBadge(due);
+      const s = store.getState().settings;
+      if (s.notifications.enabled && due > 0) {
+        scheduleReminder(s.notifications.reminderHour, `You have ${due} cards due.`);
+      }
+    })().catch(console.error);
   }, []);
   return (
     <ThemeProvider theme={theme} reduceMotion={reduceMotion}>

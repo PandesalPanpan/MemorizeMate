@@ -43,7 +43,11 @@ export function StudyScreen() {
 
   async function onGrade(r: Rating) {
     await store.getState().reviewCard(card.id, r, new Date());
-    setQueue((prev) => (prev ? prev.slice(1) : prev));
+    setQueue((prev) => {
+      const rest = prev ? prev.slice(1) : prev;
+      if (rest && rest.length === 0) store.getState().endSession();
+      return rest;
+    });
   }
 
   return (
