@@ -42,6 +42,7 @@ export interface Deck {
   icon?: string;        // emoji or icon name
   desiredRetention: number; // 0.7 - 0.97
   createdAt: number;   // epoch ms
+  archived?: boolean;
 }
 
 export interface Card {
@@ -66,6 +67,16 @@ export interface ReviewLog {
   scheduledDays: number;
 }
 
+export interface StudySession {
+  id: string;
+  deckIds: string[];        // which decks were studied
+  startedAt: number;        // epoch ms
+  endedAt: number;          // epoch ms
+  cardsReviewed: number;
+  cardsGraduated: number;
+  ratings: Record<Rating, number>; // count per rating
+}
+
 export interface NotificationSettings {
   enabled: boolean;
   reminderHour: number; // 0-23
@@ -76,6 +87,8 @@ export interface Settings {
   soundEnabled: boolean;
   reduceMotion: boolean;
   sidebarCollapsed: boolean;
+  showTimer?: boolean;
+  onboardingComplete?: boolean;
   notifications: NotificationSettings;
 }
 
