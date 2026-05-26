@@ -22,7 +22,7 @@ describe('DonationScreen', () => {
     );
     expect(screen.getByText(/0976 429 5810/)).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: /unlock without donating/i }));
-    expect(store.getState().lives.current).toBe(10);
     expect(await screen.findByText('Decks Page')).toBeInTheDocument();
+    expect(store.getState().lives.current).toBe(10);
   });
 });

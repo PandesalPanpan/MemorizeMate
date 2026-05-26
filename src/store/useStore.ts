@@ -165,4 +165,7 @@ export function createStore(repo: Repository = defaultRepo) {
 }
 
 export const store = createStore();
+if (typeof window !== 'undefined' && import.meta.env?.DEV) {
+  (window as unknown as { __mmStore?: typeof store }).__mmStore = store;
+}
 export const useStore = <T>(selector: (s: StoreState) => T) => useZustand(store, selector);
