@@ -1,0 +1,5 @@
+.countdown {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  color: var(--color-muted);
+}

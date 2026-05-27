@@ -17,12 +17,12 @@ export function Layout({ fab }: { fab?: ReactNode }) {
       {isDesktop ? (
         <>
           <Sidebar collapsed={collapsed} onToggle={() => store.getState().updateSettings({ sidebarCollapsed: !collapsed })} />
-          <div className={styles.deskLives}><LivesIndicator current={lives.current} /></div>
+          <div className={styles.deskLives}><LivesIndicator current={lives.current} lives={lives} /></div>
         </>
       ) : (
         <header className={styles.topbar}>
           <span className={styles.topword}>Memorize<span>Mate</span></span>
-          <LivesIndicator current={lives.current} />
+          <LivesIndicator current={lives.current} lives={lives} />
         </header>
       )}
       <motion.main
