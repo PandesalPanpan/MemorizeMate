@@ -42,6 +42,7 @@ export function StudyScreen() {
   const reviewedRef = useRef(0);
   const graduatedRef = useRef(0);
   const deckIdsRef = useRef<string[]>([]);
+  const sessionEndingRef = useRef(false);
 
   if (isLocked(lives, Date.now())) return <LockoutScreen />;
 
@@ -92,6 +93,8 @@ export function StudyScreen() {
   }, [current, entries, cardMap]);
 
   const endSessionNow = useCallback(async () => {
+    if (sessionEndingRef.current) return;
+    sessionEndingRef.current = true;
     await store.getState().endSession();
     await store.getState().saveSession({
       id: crypto.randomUUID(),
@@ -154,15 +157,14 @@ export function StudyScreen() {
     const updated = gradeEntry(current, r, Date.now());
     if (updated.graduated) graduatedRef.current += 1;
 
-    setEntries((prev) => {
-      const next = prev.map((e) => (e.cardId === updated.cardId ? updated : e));
-      if (allGraduated(next)) {
-        endSessionNow();
-      }
-      const available = nextAvailableEntry(next, Date.now());
-      setCurrent(available);
-      return next;
-    });
+    const next = entries.map((e) => (e.cardId === updated.cardId ? updated : e));
+    if (allGraduated(next)) {
+      setEntries(next);
+      await endSessionNow();
+      return;
+    }
+    setEntries(next);
+    setCurrent(nextAvailableEntry(next, Date.now()));
   }
 
   return (
