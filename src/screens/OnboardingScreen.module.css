@@ -1,0 +1,5 @@
+.page { max-width: 480px; margin: 0 auto; padding: var(--space-2xl) var(--space-md); }
+.skip { display: flex; justify-content: flex-end; margin-bottom: var(--space-xl); }
+.form { display: flex; flex-direction: column; gap: var(--space-md); }
+.sub { color: var(--color-text-soft); margin-bottom: var(--space-sm); }
+.cardActions { display: flex; gap: var(--space-md); margin-top: var(--space-md); }

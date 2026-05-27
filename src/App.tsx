@@ -17,11 +17,22 @@ import { DeckPickerScreen } from './screens/DeckPickerScreen';
 import { StatsScreen } from './screens/StatsScreen';
 import { AIGenerateScreen } from './screens/AIGenerateScreen';
 import { DonationScreen } from './screens/DonationScreen';
+import { LandingScreen } from './screens/LandingScreen';
+import { OnboardingScreen } from './screens/OnboardingScreen';
 import { useStore, store } from './store/useStore';
 import { setBadge, scheduleReminder } from './services/notifications';
 import { isDue } from './fsrs/scheduler';
 
 const Router = (import.meta as any).vitest ? MemoryRouter : BrowserRouter;
+
+function GateRoute({ children }: { children: React.ReactNode }) {
+  const decks = useStore((s) => s.decks);
+  const onboardingComplete = useStore((s) => s.settings.onboardingComplete);
+  if (!onboardingComplete && decks.length === 0) {
+    return <LandingScreen />;
+  }
+  return <>{children}</>;
+}
 
 export function App() {
   const theme = useStore((s) => s.settings.theme);
@@ -44,8 +55,9 @@ export function App() {
       <MotionConfig reducedMotion={reduceMotion ? 'always' : 'user'}>
         <Router>
           <Routes>
+            <Route path="/onboarding" element={<OnboardingScreen />} />
             <Route element={<Layout fab={<QuickAddFAB />} />}>
-              <Route path="/" element={<HomeScreen />} />
+              <Route path="/" element={<GateRoute><HomeScreen /></GateRoute>} />
               <Route path="/decks" element={<DecksScreen />} />
               <Route path="/decks/:deckId" element={<DeckDetailScreen />} />
               <Route path="/decks/:deckId/edit" element={<DeckEditorScreen />} />
