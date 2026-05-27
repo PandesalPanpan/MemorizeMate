@@ -2,7 +2,7 @@ import { createStore as createZustand, useStore as useZustand } from 'zustand';
 import type { Repository } from '../data/repository';
 import { repository as defaultRepo } from '../data/indexeddb-repository';
 import { newCard, grade, isDue } from '../fsrs/scheduler';
-import type { Deck, Card, Rating, Settings, LivesState, ExamResult, DeckColor } from '../types/models';
+import type { Deck, Card, Rating, Settings, LivesState, ExamResult, DeckColor, StudySession } from '../types/models';
 import { DEFAULT_SETTINGS, INITIAL_LIVES } from '../types/models';
 import { loseLife as loseLifeFn, manualUnlock as unlockFn, endSession as endSessionFn, resolveLives } from '../lives/livesMachine';
 import { scoreAttempt } from '../exam/examLogic';
@@ -32,6 +32,10 @@ export interface StoreState {
   endSession(now?: number): Promise<void>;
   manualUnlock(now?: number): Promise<void>;
   finishExam(deckId: string, results: ExamResult[], now?: number): Promise<void>;
+  archiveDeck(deckId: string): Promise<void>;
+  unarchiveDeck(deckId: string): Promise<void>;
+  dueCardsMulti(deckIds: string[], now: Date): Promise<Card[]>;
+  saveSession(session: StudySession): Promise<void>;
 }
 
 export function createStore(repo: Repository = defaultRepo) {
@@ -51,7 +55,8 @@ export function createStore(repo: Repository = defaultRepo) {
     async load() {
       try {
         const r = get().repo;
-        set({ decks: await r.listDecks(), settings: await r.getSettings(), error: null });
+        const allDecks = await r.listDecks();
+        set({ decks: allDecks.filter((d) => !d.archived), settings: await r.getSettings(), error: null });
       } catch (e) { get()._setError(e); }
     },
 
@@ -160,6 +165,40 @@ export function createStore(repo: Repository = defaultRepo) {
 
     async finishExam(deckId, results, now = Date.now()) {
       await get().repo.addExamAttempt({ id: id(), deckId, timestamp: now, results, score: scoreAttempt(results) });
+    },
+
+    async archiveDeck(deckId) {
+      const deck = await get().repo.getDeck(deckId);
+      if (!deck) return;
+      const updated = { ...deck, archived: true };
+      await get().repo.putDeck(updated);
+      set({ decks: get().decks.filter((d) => d.id !== deckId) });
+    },
+
+    async unarchiveDeck(deckId) {
+      const deck = await get().repo.getDeck(deckId);
+      if (!deck) return;
+      const updated = { ...deck, archived: false };
+      await get().repo.putDeck(updated);
+      set({ decks: [...get().decks, updated] });
+    },
+
+    async dueCardsMulti(deckIds, now) {
+      const results: Card[] = [];
+      for (const deckId of deckIds) {
+        const cards = await get().repo.listCards(deckId);
+        results.push(...cards.filter((c) => isDue(c.srs, now)));
+      }
+      // Fisher-Yates shuffle for random interleaving
+      for (let i = results.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [results[i], results[j]] = [results[j], results[i]];
+      }
+      return results;
+    },
+
+    async saveSession(session) {
+      await get().repo.addSession(session);
     },
   }));
 }
