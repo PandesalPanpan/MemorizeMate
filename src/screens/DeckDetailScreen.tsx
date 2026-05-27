@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { Pencil } from 'lucide-react';
 import { store } from '../store/useStore';
 import { Button } from '../components/ui/Button';
 import { Monogram } from '../components/Monogram';
@@ -38,6 +39,11 @@ export function DeckDetailScreen() {
         <Link to={`/decks/${deck.id}/study`}><Button>Study</Button></Link>
         <Link to={`/decks/${deck.id}/exam`}><Button variant="outline">Exam</Button></Link>
         <Link to={`/decks/${deck.id}/cards/new`}><Button variant="outline">Add card</Button></Link>
+        <Link to={`/decks/${deck.id}/edit`}>
+          <Button variant="ghost" size="sm">
+            <Pencil size={16} /> Edit
+          </Button>
+        </Link>
       </div>
 
       <CardList deckId={deck.id} cards={cards} onDelete={(id) => setPendingDelete(id)} />

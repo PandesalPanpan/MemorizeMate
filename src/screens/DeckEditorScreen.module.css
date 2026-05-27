@@ -1,0 +1,6 @@
+.page { max-width: 640px; margin: 0 auto; }
+.form { display: flex; flex-direction: column; gap: var(--space-md); }
+.actions { margin-top: var(--space-md); }
+.danger { margin-top: var(--space-2xl); padding-top: var(--space-lg); border-top: 1px solid var(--color-line); }
+.danger h3 { color: var(--color-again); margin-bottom: var(--space-md); }
+.dangerActions { display: flex; gap: var(--space-md); flex-wrap: wrap; }

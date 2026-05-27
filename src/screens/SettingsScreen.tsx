@@ -1,6 +1,9 @@
+import { useEffect, useState } from 'react';
 import { useStore, store } from '../store/useStore';
+import { Button } from '../components/ui/Button';
 import { Select } from '../components/ui/Select';
 import { requestPermission } from '../services/notifications';
+import type { Deck } from '../types/models';
 import styles from './SettingsScreen.module.css';
 
 function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
@@ -61,6 +64,33 @@ export function SettingsScreen() {
           </div>
         )}
       </div>
+      <div className={styles.group}>
+        <div className={styles.groupTitle}>Archived decks</div>
+        <ArchivedDecks />
+      </div>
     </section>
+  );
+}
+
+function ArchivedDecks() {
+  const [archived, setArchived] = useState<Deck[]>([]);
+  useEffect(() => {
+    store.getState().repo.listDecks().then((all) => {
+      setArchived(all.filter((d) => d.archived));
+    });
+  }, []);
+  if (archived.length === 0) return <p className={styles.rowLabel}>No archived decks.</p>;
+  return (
+    <div>
+      {archived.map((d) => (
+        <div key={d.id} className={styles.row}>
+          <span className={styles.rowLabel}>{d.name}</span>
+          <Button variant="ghost" size="sm" onClick={async () => {
+            await store.getState().unarchiveDeck(d.id);
+            setArchived((prev) => prev.filter((x) => x.id !== d.id));
+          }}>Unarchive</Button>
+        </div>
+      ))}
+    </div>
   );
 }

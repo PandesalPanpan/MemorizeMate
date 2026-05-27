@@ -7,6 +7,7 @@ import { QuickAddFAB } from './components/QuickAddFAB';
 import { HomeScreen } from './screens/HomeScreen';
 import { DecksScreen } from './screens/DecksScreen';
 import { DeckDetailScreen } from './screens/DeckDetailScreen';
+import { DeckEditorScreen } from './screens/DeckEditorScreen';
 import { StudyScreen } from './screens/StudyScreen';
 import { CardEditorScreen } from './screens/CardEditorScreen';
 import { ImportExportScreen } from './screens/ImportExportScreen';
@@ -45,6 +46,7 @@ export function App() {
               <Route path="/" element={<HomeScreen />} />
               <Route path="/decks" element={<DecksScreen />} />
               <Route path="/decks/:deckId" element={<DeckDetailScreen />} />
+              <Route path="/decks/:deckId/edit" element={<DeckEditorScreen />} />
               <Route path="/decks/:deckId/study" element={<StudyScreen />} />
               <Route path="/decks/:deckId/exam" element={<ExamScreen />} />
               <Route path="/decks/:deckId/cards/new" element={<CardEditorScreen />} />
