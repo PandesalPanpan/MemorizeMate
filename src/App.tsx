@@ -13,6 +13,7 @@ import { CardEditorScreen } from './screens/CardEditorScreen';
 import { ImportExportScreen } from './screens/ImportExportScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { ExamScreen } from './screens/ExamScreen';
+import { DeckPickerScreen } from './screens/DeckPickerScreen';
 import { AIGenerateScreen } from './screens/AIGenerateScreen';
 import { DonationScreen } from './screens/DonationScreen';
 import { useStore, store } from './store/useStore';
@@ -47,6 +48,8 @@ export function App() {
               <Route path="/decks" element={<DecksScreen />} />
               <Route path="/decks/:deckId" element={<DeckDetailScreen />} />
               <Route path="/decks/:deckId/edit" element={<DeckEditorScreen />} />
+              <Route path="/study/pick" element={<DeckPickerScreen />} />
+              <Route path="/study" element={<StudyScreen />} />
               <Route path="/decks/:deckId/study" element={<StudyScreen />} />
               <Route path="/decks/:deckId/exam" element={<ExamScreen />} />
               <Route path="/decks/:deckId/cards/new" element={<CardEditorScreen />} />

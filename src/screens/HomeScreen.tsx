@@ -45,6 +45,9 @@ export function HomeScreen() {
             <Button>Study all due</Button>
           </Link>
         )}
+        {decks.length > 1 && (
+          <Link to="/study/pick"><Button variant="ghost" size="sm">Customize</Button></Link>
+        )}
       </div>
 
       {decks.length > 0 && (
