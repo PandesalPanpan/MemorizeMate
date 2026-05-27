@@ -26,7 +26,7 @@ describe('StudyScreen', () => {
     expect(await screen.findByText('Q')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: /show answer/i }));
     expect(screen.getByText('A')).toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: /good/i }));
+    await userEvent.click(screen.getByRole('button', { name: /easy/i }));
     expect(await screen.findByText(/all done/i)).toBeInTheDocument();
   });
 });
