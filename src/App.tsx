@@ -14,6 +14,7 @@ import { ImportExportScreen } from './screens/ImportExportScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { ExamScreen } from './screens/ExamScreen';
 import { DeckPickerScreen } from './screens/DeckPickerScreen';
+import { StatsScreen } from './screens/StatsScreen';
 import { AIGenerateScreen } from './screens/AIGenerateScreen';
 import { DonationScreen } from './screens/DonationScreen';
 import { useStore, store } from './store/useStore';
@@ -58,6 +59,8 @@ export function App() {
               <Route path="/generate" element={<AIGenerateScreen />} />
               <Route path="/unlock" element={<DonationScreen />} />
               <Route path="/settings" element={<SettingsScreen />} />
+              <Route path="/decks/:deckId/stats" element={<StatsScreen />} />
+              <Route path="/stats" element={<StatsScreen />} />
             </Route>
           </Routes>
         </Router>

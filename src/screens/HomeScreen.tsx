@@ -65,6 +65,8 @@ export function HomeScreen() {
         <h3>Your activity</h3>
         <div className={styles.card}><Heatmap counts={counts} /></div>
       </div>
+
+      <Link to="/stats"><Button variant="ghost" size="sm">View all stats</Button></Link>
     </section>
   );
 }
