@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SettingsScreen } from './SettingsScreen';
 import { store } from '../store/useStore';
@@ -13,7 +13,10 @@ describe('SettingsScreen', () => {
 
   it('toggles dark theme and persists it to the store', async () => {
     render(<SettingsScreen />);
-    await userEvent.selectOptions(screen.getByLabelText(/theme/i), 'dark');
-    expect(store.getState().settings.theme).toBe('dark');
+    const select = screen.getByLabelText(/theme/i) as HTMLSelectElement;
+    await userEvent.selectOptions(select, 'dark');
+    await waitFor(() => {
+      expect(store.getState().settings.theme).toBe('dark');
+    });
   });
 });
