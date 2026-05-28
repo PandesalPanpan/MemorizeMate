@@ -2,14 +2,17 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { Card } from '../types/models';
 import { Field } from './ui/Field';
+import { isDue } from '../fsrs/scheduler';
 import styles from './CardList.module.css';
 
 export function CardList({ deckId, cards, onDelete }: { deckId: string; cards: Card[]; onDelete: (id: string) => void }) {
   const [q, setQ] = useState('');
-  const [leechOnly, setLeechOnly] = useState(false);
+  const [filter, setFilter] = useState<'all' | 'due' | 'leeches' | 'new'>('all');
 
   const filtered = cards.filter((c) => {
-    if (leechOnly && !c.leech) return false;
+    if (filter === 'leeches' && !c.leech) return false;
+    if (filter === 'new' && c.srs.reps > 0) return false;
+    if (filter === 'due' && !isDue(c.srs, new Date())) return false;
     const hay = (c.front + ' ' + c.back).toLowerCase();
     return hay.includes(q.toLowerCase());
   });
@@ -20,13 +23,17 @@ export function CardList({ deckId, cards, onDelete }: { deckId: string; cards: C
         <Field label="Search cards" htmlFor="cardSearch">
           <input id="cardSearch" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search…" />
         </Field>
-        <button
-          className={`${styles.filter} ${leechOnly ? styles.on : ''}`}
-          aria-pressed={leechOnly}
-          onClick={() => setLeechOnly((v) => !v)}
-        >
-          Leeches only
-        </button>
+      </div>
+      <div className={styles.toolbar}>
+        {(['all', 'due', 'leeches', 'new'] as const).map((f) => (
+          <button
+            key={f}
+            className={`${styles.pill} ${filter === f ? styles.pillActive : ''}`}
+            onClick={() => setFilter(f)}
+          >
+            {f === 'all' ? 'All' : f === 'due' ? 'Due' : f === 'leeches' ? 'Leeches' : 'New'}
+          </button>
+        ))}
       </div>
 
       {filtered.length === 0 ? (

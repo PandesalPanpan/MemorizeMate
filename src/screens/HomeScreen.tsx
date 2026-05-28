@@ -53,9 +53,13 @@ export function HomeScreen() {
       {decks.length > 0 && (
         <ul className={styles.deckList}>
           {decks.map((d) => (
-            <li key={d.id} className={styles.deckRow}>
-              <Link to={`/decks/${d.id}`}>{d.name}</Link>
-              <span className={styles.deckDue}>{dueByDeck[d.id] ?? 0} due</span>
+            <li key={d.id}>
+              <Link to={`/decks/${d.id}`} className={styles.deckRow}>
+                <span className={styles.deckColor} style={{ background: `var(--deck-${d.color})` }} />
+                <span className={styles.deckName}>{d.name}</span>
+                <span className={styles.deckDue}>{dueByDeck[d.id] ?? 0} due</span>
+                <span className={styles.chevron}>›</span>
+              </Link>
             </li>
           ))}
         </ul>

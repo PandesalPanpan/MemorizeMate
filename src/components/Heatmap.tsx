@@ -9,7 +9,7 @@ function shade(count: number): string {
 }
 const WEEKDAYS = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
 
-export function Heatmap({ counts, days = 84, today = new Date() }: { counts: Record<string, number>; days?: number; today?: Date }) {
+export function Heatmap({ counts, days = 168, today = new Date() }: { counts: Record<string, number>; days?: number; today?: Date }) {
   const { weeks, monthLabels } = buildCalendar(counts, days, today);
   return (
     <div className={styles.wrap}>

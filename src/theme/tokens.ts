@@ -30,6 +30,7 @@ export const tokens = {
     darkLine: '#3A332B',
     darkMuted: '#9A9082',
     darkAccent: '#E0744D',
+    darkAccentWash: 'rgba(224, 116, 77, 0.30)',
   },
   font: {
     display: "'Fraunces Variable', Fraunces, Georgia, serif",
@@ -71,7 +72,7 @@ export function cssVars(mode: ThemeMode): Record<string, string> {
     '--color-accent': light ? c.accent : c.darkAccent,
     '--color-accent-deep': c.accentDeep,
     '--color-accent-soft': c.accentSoft,
-    '--color-accent-wash': c.accentWash,
+    '--color-accent-wash': light ? c.accentWash : c.darkAccentWash,
     // grade colors:
     '--color-again': c.again,
     '--color-hard': c.hard,
