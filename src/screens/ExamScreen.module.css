@@ -5,3 +5,7 @@
 .answer { margin-top: var(--space-md); padding-top: var(--space-md); border-top: 1px solid var(--color-line); color: var(--color-accent-deep); font-size: var(--step-1); }
 .score { font-family: var(--font-display); font-size: var(--step-3); color: var(--color-accent-deep); }
 .actions { display: flex; gap: var(--space-sm); justify-content: center; flex-wrap: wrap; }
+.key { font-size: var(--step--2); font-family: var(--font-mono); color: var(--color-muted); margin-left: 6px; padding: 1px 5px; border: 1px solid var(--color-line); border-radius: var(--radius-sm); }
+.keyHints { display: flex; gap: var(--space-md); justify-content: center; flex-wrap: wrap; margin-top: var(--space-md); }
+.keyHint { font-size: var(--step--1); color: var(--color-text-soft); }
+.keyHint kbd { font-family: var(--font-mono); font-size: var(--step--2); padding: 1px 5px; border: 1px solid var(--color-line); border-radius: var(--radius-sm); margin-right: 4px; }

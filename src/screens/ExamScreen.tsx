@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { store } from '../store/useStore';
 import { orderExamCards, scoreAttempt } from '../exam/examLogic';
@@ -37,9 +37,9 @@ export function ExamScreen() {
     setPhase('running');
   }
 
-  async function answer(correct: boolean) {
+  async function answer(correct: boolean, confidence?: 0 | 1 | 2) {
     const card = queue[i];
-    const next = [...results, { cardId: card.id, correct }];
+    const next = [...results, { cardId: card.id, correct, ...(confidence !== undefined && { confidence }) }];
     setResults(next);
     setRevealed(false);
     if (i + 1 < queue.length) {
@@ -56,6 +56,30 @@ export function ExamScreen() {
     }
     setPhase('intro');
   }
+
+  const answerRef = useRef(answer);
+  answerRef.current = answer;
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (phase === 'running') {
+        if (!revealed && (e.key === ' ' || e.key === 'Enter')) {
+          e.preventDefault();
+          setRevealed(true);
+          return;
+        }
+        if (revealed) {
+          if (e.key === '1') { e.preventDefault(); answerRef.current(false); }
+          else if (e.key === '2') { e.preventDefault(); answerRef.current(true, 0); }
+          else if (e.key === '3') { e.preventDefault(); answerRef.current(true, 1); }
+          else if (e.key === '4') { e.preventDefault(); answerRef.current(true, 2); }
+        }
+      }
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [phase, revealed]);
 
   if (phase === 'intro') {
     return (
@@ -97,10 +121,18 @@ export function ExamScreen() {
       {!revealed ? (
         <Button onClick={() => setRevealed(true)}>Show answer</Button>
       ) : (
-        <div className={styles.actions}>
-          <Button onClick={() => answer(true)}>Got it right</Button>
-          <Button variant="outline" onClick={() => answer(false)}>Got it wrong</Button>
-        </div>
+        <>
+          <div className={styles.actions}>
+            <Button onClick={() => answer(true)}>Got it right <span className={styles.key}>3</span></Button>
+            <Button variant="outline" onClick={() => answer(false)}>Got it wrong <span className={styles.key}>1</span></Button>
+          </div>
+          <div className={styles.keyHints}>
+            <span className={styles.keyHint}><kbd>1</kbd> Wrong</span>
+            <span className={styles.keyHint}><kbd>2</kbd> Right (unsure)</span>
+            <span className={styles.keyHint}><kbd>3</kbd> Right (confident)</span>
+            <span className={styles.keyHint}><kbd>4</kbd> Right (very confident)</span>
+          </div>
+        </>
       )}
     </section>
   );

@@ -25,6 +25,7 @@ export interface LivesState {
 export interface ExamResult {
   cardId: string;
   correct: boolean;
+  confidence?: 0 | 1 | 2; // key 2→0, key 3→1, key 4→2; only set when correct
 }
 export interface ExamAttempt {
   id: string;
