@@ -10,9 +10,22 @@ const GCASH = '0976 429 5810';
 export function DonationScreen() {
   const nav = useNavigate();
   const [amount, setAmount] = useState('');
+  const [error, setError] = useState('');
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    setError('');
+
+    const trimmed = amount.trim();
+    if (trimmed === '') {
+      setError('Enter any amount — even ₱0 works.');
+      return;
+    }
+    if (!/^\d+(\.\d{1,2})?$/.test(trimmed)) {
+      setError('Enter a valid amount (e.g. 50 or 25.50).');
+      return;
+    }
+
     await store.getState().manualUnlock();
     nav('/');
   }
@@ -29,8 +42,9 @@ export function DonationScreen() {
 
       <form className={styles.form} onSubmit={submit}>
         <Field label="How much would you like to donate? (PHP)" htmlFor="amt">
-          <input id="amt" inputMode="numeric" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="e.g. 50" />
+          <input id="amt" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="e.g. 50" />
         </Field>
+        {error && <p className={styles.error}>{error}</p>}
         <Button type="submit">Unlock lives</Button>
       </form>
     </section>

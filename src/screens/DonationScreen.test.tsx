@@ -21,8 +21,22 @@ describe('DonationScreen', () => {
       </MemoryRouter>,
     );
     expect(screen.getByText(/0976 429 5810/)).toBeInTheDocument();
+    await userEvent.type(screen.getByLabelText(/how much/i), '0');
     await userEvent.click(screen.getByRole('button', { name: /unlock lives/i }));
     expect(await screen.findByText('Home Page')).toBeInTheDocument();
     expect(store.getState().lives.current).toBe(10);
+  });
+
+  it('shows an error for invalid amount', async () => {
+    render(
+      <MemoryRouter initialEntries={['/unlock']}>
+        <Routes>
+          <Route path="/unlock" element={<DonationScreen />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+    await userEvent.type(screen.getByLabelText(/how much/i), 'abc');
+    await userEvent.click(screen.getByRole('button', { name: /unlock lives/i }));
+    expect(await screen.findByText(/valid amount/i)).toBeInTheDocument();
   });
 });

@@ -18,6 +18,10 @@ export function loseLife(state: LivesState, now: number): LivesState {
 
 export function endSession(state: LivesState, now: number): LivesState {
   const resolved = resolveLives(state, now);
+  // Preserve existing refill countdown — only stamp a new timer if lives are full
+  if (resolved.current < INITIAL_LIVES) {
+    return { current: resolved.current, lastEventAt: state.lastEventAt };
+  }
   return { current: resolved.current, lastEventAt: now };
 }
 
