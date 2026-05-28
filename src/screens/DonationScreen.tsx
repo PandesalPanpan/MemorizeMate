@@ -11,30 +11,28 @@ export function DonationScreen() {
   const nav = useNavigate();
   const [amount, setAmount] = useState('');
 
-  async function unlock() {
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
     await store.getState().manualUnlock();
-    nav('/decks');
+    nav('/');
   }
 
   return (
     <section className={styles.page}>
       <h2>Support MemorizeMate</h2>
-      <p>If MemorizeMate helps you, you can send a small thank-you via GCash. Donating is optional — you can unlock either way.</p>
+      <p>If MemorizeMate helps you study, consider sending a small thank-you via GCash.</p>
 
       <div className={styles.card}>
         <div className={styles.label}>GCash number</div>
         <div className={styles.number}>{GCASH}</div>
       </div>
 
-      <Field label="Amount (optional, ₱)" htmlFor="amt">
-        <input id="amt" inputMode="numeric" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="e.g. 50" />
-      </Field>
-
-      <div className={styles.actions}>
-        <Button onClick={unlock}>I've donated — unlock</Button>
-        <Button variant="ghost" onClick={unlock}>Unlock without donating</Button>
-      </div>
-      <p className={styles.note}>Honor system — we don't verify payments. Thank you either way. 🧡</p>
+      <form className={styles.form} onSubmit={submit}>
+        <Field label="How much would you like to donate? (PHP)" htmlFor="amt">
+          <input id="amt" inputMode="numeric" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="e.g. 50" />
+        </Field>
+        <Button type="submit">Unlock lives</Button>
+      </form>
     </section>
   );
 }

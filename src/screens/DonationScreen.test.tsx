@@ -11,18 +11,18 @@ describe('DonationScreen', () => {
     store.setState({ repo: new IndexedDbRepository('don-' + Math.random()), lives: { current: 0, lastEventAt: Date.now() } });
   });
 
-  it('shows the GCash number and unlocks without donating', async () => {
+  it('shows the GCash number and unlocks with any amount', async () => {
     render(
       <MemoryRouter initialEntries={['/unlock']}>
         <Routes>
           <Route path="/unlock" element={<DonationScreen />} />
-          <Route path="/decks" element={<div>Decks Page</div>} />
+          <Route path="/" element={<div>Home Page</div>} />
         </Routes>
       </MemoryRouter>,
     );
     expect(screen.getByText(/0976 429 5810/)).toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: /unlock without donating/i }));
-    expect(await screen.findByText('Decks Page')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /unlock lives/i }));
+    expect(await screen.findByText('Home Page')).toBeInTheDocument();
     expect(store.getState().lives.current).toBe(10);
   });
 });
