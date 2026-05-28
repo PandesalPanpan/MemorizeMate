@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ClozeEditor } from '../components/ClozeEditor';
+import { BackLink } from '../components/BackLink';
 import { Button } from '../components/ui/Button';
 import { Field } from '../components/ui/Field';
 import { store } from '../store/useStore';
@@ -41,6 +42,7 @@ export function CardEditorScreen() {
 
   return (
     <section>
+      <BackLink to={`/decks/${deckId}`} label="Back to deck" />
       <h2>{existing ? 'Edit card' : 'New card'}</h2>
       <form className={styles.form} onSubmit={save}>
         <div className={styles.seg} role="group" aria-label="Card type">

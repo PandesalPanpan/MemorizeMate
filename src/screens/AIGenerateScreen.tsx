@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { buildPrompt } from '../ai/promptBuilder';
 import { parseImport } from '../importer/parser';
 import { useStore, store } from '../store/useStore';
+import { BackLink } from '../components/BackLink';
 import { Button } from '../components/ui/Button';
 import { Field } from '../components/ui/Field';
 import { Select } from '../components/ui/Select';
@@ -34,11 +35,12 @@ export function AIGenerateScreen() {
 
   return (
     <section>
+      <BackLink to="/" label="Home" />
       <h2>Generate with AI</h2>
       <p>Fill in a topic, copy the prompt into any AI assistant (ChatGPT, Claude, …), then paste its answer back here.</p>
 
       <Field label="Topic" htmlFor="topic">
-        <input id="topic" value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="e.g. The Krebs cycle" />
+        <input id="topic" value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="e.g. Software Process and Product Quality" />
       </Field>
       <div className={styles.opts}>
         <Field label="How many" htmlFor="count">
@@ -60,7 +62,9 @@ export function AIGenerateScreen() {
 
       <Select id="aiDeck" label="Into deck" value={target} onChange={(v) => setDeckId(v)}
         options={decks.map((d) => ({ value: d.id, label: d.name }))} />
-      <Button onClick={doImport} disabled={!result.cards.length}>Import</Button>
+      <div className={styles.importBtn}>
+        <Button onClick={doImport} disabled={!result.cards.length}>Import</Button>
+      </div>
     </section>
   );
 }

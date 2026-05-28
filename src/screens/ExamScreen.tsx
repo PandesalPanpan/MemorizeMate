@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { store } from '../store/useStore';
 import { orderExamCards, scoreAttempt } from '../exam/examLogic';
 import { renderCloze, clozeIndices } from '../cloze/parser';
+import { BackLink } from '../components/BackLink';
 import { Button } from '../components/ui/Button';
 import type { Card, ExamResult } from '../types/models';
 import styles from './ExamScreen.module.css';
@@ -59,6 +60,7 @@ export function ExamScreen() {
   if (phase === 'intro') {
     return (
       <section className={styles.page}>
+        <BackLink to={`/decks/${deckId}`} label="Back to deck" />
         <h2>Exam mode</h2>
         <p>A test-style run through this deck. Your answers won't change your normal review schedule unless you choose to apply them at the end. Previously-missed cards come first.</p>
         <Button onClick={start}>Start exam</Button>

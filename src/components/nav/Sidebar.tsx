@@ -4,6 +4,7 @@ import { NAV_ITEMS } from './navItems';
 import styles from './Sidebar.module.css';
 
 export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
+  const iconSize = collapsed ? 24 : 20;
   return (
     <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ''}`}>
       <div className={styles.brand}>
@@ -19,7 +20,7 @@ export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle:
             title={label}
             className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}
           >
-            <Icon size={20} strokeWidth={1.75} />
+            <Icon size={iconSize} strokeWidth={1.75} />
             {!collapsed && <span>{label}</span>}
           </NavLink>
         ))}
@@ -29,7 +30,7 @@ export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle:
         aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         onClick={onToggle}
       >
-        {collapsed ? <PanelLeftOpen size={18} /> : <><PanelLeftClose size={18} /> <span>Collapse</span></>}
+        {collapsed ? <PanelLeftOpen size={20} /> : <><PanelLeftClose size={18} /> <span>Collapse</span></>}
       </button>
     </aside>
   );

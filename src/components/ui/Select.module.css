@@ -1,4 +1,4 @@
-.field { display: flex; flex-direction: column; gap: 6px; }
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: var(--space-md); }
 .label { font-weight: 600; font-size: var(--step--1); color: var(--color-text-soft); }
 .wrap { position: relative; }
 .select {

@@ -1,12 +1,18 @@
 .wrap { display: inline-flex; flex-direction: column; gap: 6px; }
-.months { display: grid; grid-auto-flow: column; grid-auto-columns: 16px; margin-left: 30px; height: 14px; }
+.months { display: grid; grid-auto-flow: column; grid-auto-columns: var(--hm-cell); margin-left: calc(var(--hm-label-w) + var(--hm-gap)); height: 16px; }
 .month { font-size: var(--step--2); color: var(--color-muted); }
-.body { display: flex; gap: 4px; }
-.weekdays { display: grid; grid-template-rows: repeat(7, 13px); gap: 3px; width: 26px; }
-.weekday { font-size: var(--step--2); color: var(--color-muted); line-height: 13px; }
-.grid { display: flex; gap: 3px; }
-.week { display: grid; grid-template-rows: repeat(7, 13px); gap: 3px; }
-.cell { width: 13px; height: 13px; border-radius: 3px; border: 1px solid color-mix(in oklab, var(--color-line) 60%, transparent); }
+.body { display: flex; gap: var(--hm-gap); }
+.weekdays { display: grid; grid-template-rows: repeat(7, var(--hm-cell)); gap: var(--hm-gap); width: var(--hm-label-w); }
+.weekday { font-size: var(--step--2); color: var(--color-muted); line-height: var(--hm-cell); }
+.grid { display: flex; gap: var(--hm-gap); }
+.week { display: grid; grid-template-rows: repeat(7, var(--hm-cell)); gap: var(--hm-gap); }
+.cell { width: var(--hm-cell); height: var(--hm-cell); border-radius: 3px; border: 1px solid color-mix(in oklab, var(--color-line) 60%, transparent); }
 .empty { background: transparent !important; border-color: transparent; }
-.legend { display: flex; align-items: center; gap: 6px; color: var(--color-muted); font-size: var(--step--2); margin-left: 30px; }
-.swatch { width: 11px; height: 11px; border-radius: 2px; }
+.legend { display: flex; align-items: center; gap: 6px; color: var(--color-muted); font-size: var(--step--2); margin-left: calc(var(--hm-label-w) + var(--hm-gap)); }
+.swatch { width: 12px; height: 12px; border-radius: 2px; }
+
+/* Mobile-first sizing; scale up on desktop */
+.wrap { --hm-cell: 13px; --hm-gap: 3px; --hm-label-w: 26px; }
+@media (min-width: 900px) {
+  .wrap { --hm-cell: 18px; --hm-gap: 4px; --hm-label-w: 32px; }
+}

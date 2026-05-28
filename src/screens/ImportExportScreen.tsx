@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { parseImport } from '../importer/parser';
 import { toJSON, toCSV } from '../exporter/exporter';
 import { useStore, store } from '../store/useStore';
+import { BackLink } from '../components/BackLink';
 import { Button } from '../components/ui/Button';
 import { Field } from '../components/ui/Field';
 import { Select } from '../components/ui/Select';
@@ -36,6 +37,7 @@ export function ImportExportScreen() {
 
   return (
     <section>
+      <BackLink to="/" label="Home" />
       <h2>Import &amp; Export</h2>
 
       <Select

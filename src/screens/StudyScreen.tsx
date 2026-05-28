@@ -43,10 +43,10 @@ export function StudyScreen() {
   const graduatedRef = useRef(0);
   const deckIdsRef = useRef<string[]>([]);
   const sessionEndingRef = useRef(false);
-
-  if (isLocked(lives, Date.now())) return <LockoutScreen />;
+  const locked = isLocked(lives, Date.now());
 
   useEffect(() => {
+    if (locked) return;
     const deckIdsParam = searchParams.get('deckIds');
     const ids = deckIdsParam ? deckIdsParam.split(',') : deckId ? [deckId] : [];
     deckIdsRef.current = ids;
@@ -70,7 +70,7 @@ export function StudyScreen() {
       setCurrent(nextAvailableEntry(sessionEntries, now));
       startedAtRef.current = now;
     })();
-  }, [deckId, searchParams]);
+  }, [deckId, searchParams, locked]);
 
   useEffect(() => {
     if (!cardMap || entries.length === 0) return;
@@ -108,6 +108,8 @@ export function StudyScreen() {
     setEntries((prev) => prev.map((e) => ({ ...e, graduated: true })));
     setCurrent(null);
   }, []);
+
+  if (locked) return <LockoutScreen />;
 
   if (!cardMap) return <p>Loading…</p>;
 

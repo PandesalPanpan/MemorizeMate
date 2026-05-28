@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Pencil } from 'lucide-react';
 import { store } from '../store/useStore';
+import { BackLink } from '../components/BackLink';
 import { Button } from '../components/ui/Button';
 import { Monogram } from '../components/Monogram';
 import { CardList } from '../components/CardList';
@@ -28,6 +29,7 @@ export function DeckDetailScreen() {
 
   return (
     <section>
+      <BackLink to="/decks" label="Decks" />
       <div className={styles.head}>
         <Monogram name={deck.name} color={deck.color} />
         <div>

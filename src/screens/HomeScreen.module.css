@@ -25,4 +25,4 @@
 .chevron { color: var(--color-muted); font-size: var(--step-1); }
 .activity { margin-top: var(--space-xl); }
 .activity h3 { margin-bottom: var(--space-md); }
-.card { display: inline-block; background: var(--color-surface); border: 1px solid var(--color-line); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); padding: var(--space-lg); overflow-x: auto; max-width: 100%; }
+.card { display: block; background: var(--color-surface); border: 1px solid var(--color-line); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); padding: var(--space-lg); overflow-x: auto; max-width: 100%; }
