@@ -16,6 +16,7 @@ export interface StoreState {
   settings: Settings;
   error: string | null;
   _setError(e: unknown): void;
+  clearError(): void;
   load(): Promise<void>;
   createDeck(input: { name: string; description: string; color: DeckColor }): Promise<Deck>;
   updateDeck(deck: Deck): Promise<void>;
@@ -51,6 +52,8 @@ export function createStore(repo: Repository = defaultRepo) {
       console.error('MemorizeMate store error:', msg);
       set({ error: msg });
     },
+
+    clearError() { set({ error: null }); },
 
     async load() {
       try {

@@ -21,6 +21,7 @@ import { DonationScreen } from './screens/DonationScreen';
 import { NotFoundScreen } from './screens/NotFoundScreen';
 import { LandingScreen } from './screens/LandingScreen';
 import { OnboardingScreen } from './screens/OnboardingScreen';
+import { ErrorToast } from './components/ErrorToast';
 import { useStore, store } from './store/useStore';
 import { setBadge, scheduleReminder } from './services/notifications';
 import { isDue } from './fsrs/scheduler';
@@ -55,6 +56,7 @@ export function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider theme={theme} reduceMotion={reduceMotion}>
+        <ErrorToast />
         <MotionConfig reducedMotion={reduceMotion ? 'always' : 'user'}>
           <Router>
             <Routes>
