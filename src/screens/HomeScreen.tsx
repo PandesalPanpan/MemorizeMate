@@ -40,11 +40,17 @@ export function HomeScreen() {
       <div className={styles.due}>
         <div className={styles.dueNum}>{totalDue}</div>
         <div className={styles.dueLabel}>cards due today</div>
-        {decks.length > 0 && (
-          <Link to={`/decks/${(Object.keys(dueByDeck)[0] ?? decks[0].id)}/study`}>
-            <Button>Study all due</Button>
-          </Link>
-        )}
+        {decks.length > 0 && (() => {
+          const dueIds = Object.keys(dueByDeck);
+          const studyLink = dueIds.length > 1
+            ? `/study?deckIds=${dueIds.join(',')}`
+            : `/decks/${dueIds[0] ?? decks[0].id}/study`;
+          return (
+            <Link to={studyLink}>
+              <Button>Study all due</Button>
+            </Link>
+          );
+        })()}
         {decks.length > 1 && (
           <Link to="/study/pick"><Button variant="ghost" size="sm">Customize</Button></Link>
         )}
