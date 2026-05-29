@@ -1,26 +1,27 @@
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { MemoryRouter, BrowserRouter, Routes, Route } from 'react-router-dom';
 import { MotionConfig } from 'framer-motion';
 import { ThemeProvider } from './theme/ThemeProvider';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Layout } from './components/Layout';
 import { QuickAddFAB } from './components/QuickAddFAB';
-import { HomeScreen } from './screens/HomeScreen';
-import { DecksScreen } from './screens/DecksScreen';
-import { DeckDetailScreen } from './screens/DeckDetailScreen';
-import { DeckEditorScreen } from './screens/DeckEditorScreen';
-import { StudyScreen } from './screens/StudyScreen';
-import { CardEditorScreen } from './screens/CardEditorScreen';
-import { ImportExportScreen } from './screens/ImportExportScreen';
-import { SettingsScreen } from './screens/SettingsScreen';
-import { ExamScreen } from './screens/ExamScreen';
-import { DeckPickerScreen } from './screens/DeckPickerScreen';
-import { StatsScreen } from './screens/StatsScreen';
-import { AIGenerateScreen } from './screens/AIGenerateScreen';
-import { DonationScreen } from './screens/DonationScreen';
-import { NotFoundScreen } from './screens/NotFoundScreen';
-import { LandingScreen } from './screens/LandingScreen';
-import { OnboardingScreen } from './screens/OnboardingScreen';
+import { LoadingSpinner } from './components/LoadingSpinner';
+const HomeScreen = lazy(() => import('./screens/HomeScreen').then(m => ({ default: m.HomeScreen })));
+const DecksScreen = lazy(() => import('./screens/DecksScreen').then(m => ({ default: m.DecksScreen })));
+const DeckDetailScreen = lazy(() => import('./screens/DeckDetailScreen').then(m => ({ default: m.DeckDetailScreen })));
+const DeckEditorScreen = lazy(() => import('./screens/DeckEditorScreen').then(m => ({ default: m.DeckEditorScreen })));
+const StudyScreen = lazy(() => import('./screens/StudyScreen').then(m => ({ default: m.StudyScreen })));
+const CardEditorScreen = lazy(() => import('./screens/CardEditorScreen').then(m => ({ default: m.CardEditorScreen })));
+const ImportExportScreen = lazy(() => import('./screens/ImportExportScreen').then(m => ({ default: m.ImportExportScreen })));
+const SettingsScreen = lazy(() => import('./screens/SettingsScreen').then(m => ({ default: m.SettingsScreen })));
+const ExamScreen = lazy(() => import('./screens/ExamScreen').then(m => ({ default: m.ExamScreen })));
+const DeckPickerScreen = lazy(() => import('./screens/DeckPickerScreen').then(m => ({ default: m.DeckPickerScreen })));
+const StatsScreen = lazy(() => import('./screens/StatsScreen').then(m => ({ default: m.StatsScreen })));
+const AIGenerateScreen = lazy(() => import('./screens/AIGenerateScreen').then(m => ({ default: m.AIGenerateScreen })));
+const DonationScreen = lazy(() => import('./screens/DonationScreen').then(m => ({ default: m.DonationScreen })));
+const LandingScreen = lazy(() => import('./screens/LandingScreen').then(m => ({ default: m.LandingScreen })));
+const OnboardingScreen = lazy(() => import('./screens/OnboardingScreen').then(m => ({ default: m.OnboardingScreen })));
+const NotFoundScreen = lazy(() => import('./screens/NotFoundScreen').then(m => ({ default: m.NotFoundScreen })));
 import { ErrorToast } from './components/ErrorToast';
 import { useStore, store } from './store/useStore';
 import { setBadge, scheduleReminder } from './services/notifications';
@@ -59,6 +60,7 @@ export function App() {
         <ErrorToast />
         <MotionConfig reducedMotion={reduceMotion ? 'always' : 'user'}>
           <Router>
+            <Suspense fallback={<LoadingSpinner />}>
             <Routes>
               <Route path="/onboarding" element={<OnboardingScreen />} />
               <Route element={<Layout fab={<QuickAddFAB />} />}>
@@ -81,6 +83,7 @@ export function App() {
                 <Route path="*" element={<NotFoundScreen />} />
               </Route>
             </Routes>
+            </Suspense>
           </Router>
         </MotionConfig>
       </ThemeProvider>
