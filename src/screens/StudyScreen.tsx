@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { CardFlip } from '../components/CardFlip';
 import { BackLink } from '../components/BackLink';
 import { SessionTimer } from '../components/SessionTimer';
@@ -114,11 +114,20 @@ export function StudyScreen() {
   if (!cardMap) return <p>Loading…</p>;
 
   if (entries.length === 0 || allGraduated(entries)) {
+    const backTo = deckId ? `/decks/${deckId}` : '/decks';
+    const statsTo = deckId ? `/decks/${deckId}/stats` : '/stats';
+    const showExam = !!deckId;
     return (
       <section className={styles.done}>
+        <BackLink to={backTo} label="Back" />
         <div className={styles.emoji}>🎉</div>
         <h2>All done</h2>
         <p>No more cards due right now. Come back later.</p>
+        <div className={styles.dashboard}>
+          <Link to={backTo}><Button variant="outline">Back to deck</Button></Link>
+          <Link to={statsTo}><Button variant="outline">View stats</Button></Link>
+          {showExam && <Link to={`/decks/${deckId}/exam`}><Button variant="outline">Try exam</Button></Link>}
+        </div>
       </section>
     );
   }

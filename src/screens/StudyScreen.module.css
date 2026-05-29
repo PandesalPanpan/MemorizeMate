@@ -10,3 +10,4 @@
 .deckTag { display: flex; align-items: center; gap: 6px; margin-bottom: var(--space-sm); }
 .deckDot { width: 10px; height: 10px; border-radius: var(--radius-pill); }
 .deckTagName { font-size: var(--step--1); color: var(--color-text-soft); font-weight: 500; }
+.dashboard { display: flex; gap: var(--space-md); justify-content: center; flex-wrap: wrap; margin-top: var(--space-xl); }
