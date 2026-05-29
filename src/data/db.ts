@@ -5,14 +5,14 @@ import { DECK_COLORS } from '../types/models';
 export interface MMDB extends DBSchema {
   decks: { key: string; value: Deck };
   cards: { key: string; value: Card; indexes: { byDeck: string } };
-  reviewLogs: { key: string; value: ReviewLog };
+  reviewLogs: { key: string; value: ReviewLog; indexes: { byCard: string } };
   settings: { key: string; value: Settings | LivesState };
   examAttempts: { key: string; value: ExamAttempt; indexes: { byDeck: string } };
   sessions: { key: string; value: StudySession; indexes: { byDeck: string } };
 }
 
 export function openMMDB(name = 'memorizemate'): Promise<IDBPDatabase<MMDB>> {
-  return openDB<MMDB>(name, 3, {
+  return openDB<MMDB>(name, 4, {
     async upgrade(db, oldVersion, _newVersion, tx) {
       if (oldVersion < 1) {
         db.createObjectStore('decks', { keyPath: 'id' });
@@ -38,6 +38,10 @@ export function openMMDB(name = 'memorizemate'): Promise<IDBPDatabase<MMDB>> {
       if (oldVersion < 3) {
         const sessions = db.createObjectStore('sessions', { keyPath: 'id' });
         sessions.createIndex('byDeck', 'deckIds', { multiEntry: true });
+      }
+      if (oldVersion < 4) {
+        const logStore = tx.objectStore('reviewLogs');
+        logStore.createIndex('byCard', 'cardId');
       }
     },
   });

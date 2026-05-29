@@ -76,8 +76,7 @@ export class IndexedDbRepository implements Repository {
   }
 
   async listReviewLogsByCard(cardId: string): Promise<ReviewLog[]> {
-    const all = await this.listReviewLogs();
-    return all.filter((l) => l.cardId === cardId);
+    return (await this.dbp).getAllFromIndex('reviewLogs', 'byCard', cardId);
   }
 
   async getLives(): Promise<LivesState> {
