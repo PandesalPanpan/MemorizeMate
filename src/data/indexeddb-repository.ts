@@ -52,6 +52,13 @@ export class IndexedDbRepository implements Repository {
   async listReviewLogs(): Promise<ReviewLog[]> {
     return (await this.dbp).getAll('reviewLogs');
   }
+  async listReviewLogsByDeck(deckId: string): Promise<ReviewLog[]> {
+    const db = await this.dbp;
+    const cards = await db.getAllFromIndex('cards', 'byDeck', deckId);
+    const cardIds = new Set(cards.map(c => c.id));
+    const allLogs = await db.getAll('reviewLogs');
+    return allLogs.filter(l => cardIds.has(l.cardId));
+  }
 
   async getSettings(): Promise<Settings> {
     const s = await (await this.dbp).get('settings', SETTINGS_KEY) as Settings | undefined;

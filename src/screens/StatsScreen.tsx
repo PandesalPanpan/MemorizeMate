@@ -22,13 +22,15 @@ export function StatsScreen() {
     } else {
       repo.listCards().then(setCards);
     }
-    repo.listReviewLogs().then(setLogs);
+    if (deckId) {
+      repo.listReviewLogsByDeck(deckId).then(setLogs);
+    } else {
+      repo.listReviewLogs().then(setLogs);
+    }
     repo.listSessions().then(setSessions);
   }, [deckId]);
 
-  const deckLogs = deckId
-    ? logs.filter((l) => cards.some((c) => c.id === l.cardId))
-    : logs;
+  const deckLogs = logs;
 
   const totalReviews = deckLogs.length;
   const goodEasy = deckLogs.filter((l) => l.rating === 'good' || l.rating === 'easy').length;

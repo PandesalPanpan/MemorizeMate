@@ -16,6 +16,7 @@ export interface Repository {
   // review logs
   addReviewLog(log: ReviewLog): Promise<void>;
   listReviewLogs(): Promise<ReviewLog[]>;
+  listReviewLogsByDeck(deckId: string): Promise<ReviewLog[]>;
 
   // settings
   getSettings(): Promise<Settings>;

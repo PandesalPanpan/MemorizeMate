@@ -43,6 +43,26 @@ describe('IndexedDbRepository', () => {
     expect(await repo.getSettings()).toEqual(DEFAULT_SETTINGS);
   });
 
+  it('lists review logs filtered by deck via Set lookup', async () => {
+    await repo.putDeck(mkDeck('deck-a'));
+    await repo.putDeck(mkDeck('deck-b'));
+    await repo.putCard(mkCard('c1', 'deck-a'));
+    await repo.putCard(mkCard('c2', 'deck-a'));
+    await repo.putCard(mkCard('c3', 'deck-b'));
+    await repo.addReviewLog(mkReviewLog('r1', 'c1'));
+    await repo.addReviewLog(mkReviewLog('r2', 'c1'));
+    await repo.addReviewLog(mkReviewLog('r3', 'c2'));
+    await repo.addReviewLog(mkReviewLog('r4', 'c3')); // belongs to deck-b
+    const deckALogs = await repo.listReviewLogsByDeck('deck-a');
+    expect(deckALogs).toHaveLength(3);
+    expect(deckALogs.map((l) => l.id).sort()).toEqual(['r1', 'r2', 'r3']);
+    const deckBLogs = await repo.listReviewLogsByDeck('deck-b');
+    expect(deckBLogs).toHaveLength(1);
+    expect(deckBLogs[0].id).toBe('r4');
+    const emptyLogs = await repo.listReviewLogsByDeck('deck-nonexistent');
+    expect(emptyLogs).toHaveLength(0);
+  });
+
   it('lists review logs filtered by card using byCard index', async () => {
     await repo.addReviewLog(mkReviewLog('r1', 'card-a'));
     await repo.addReviewLog(mkReviewLog('r2', 'card-b'));
