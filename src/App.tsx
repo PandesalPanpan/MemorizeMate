@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { MemoryRouter, BrowserRouter, Routes, Route } from 'react-router-dom';
 import { MotionConfig } from 'framer-motion';
 import { ThemeProvider } from './theme/ThemeProvider';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { Layout } from './components/Layout';
 import { QuickAddFAB } from './components/QuickAddFAB';
 import { HomeScreen } from './screens/HomeScreen';
@@ -52,33 +53,35 @@ export function App() {
     })().catch(console.error);
   }, []);
   return (
-    <ThemeProvider theme={theme} reduceMotion={reduceMotion}>
-      <MotionConfig reducedMotion={reduceMotion ? 'always' : 'user'}>
-        <Router>
-          <Routes>
-            <Route path="/onboarding" element={<OnboardingScreen />} />
-            <Route element={<Layout fab={<QuickAddFAB />} />}>
-              <Route path="/" element={<GateRoute><HomeScreen /></GateRoute>} />
-              <Route path="/decks" element={<DecksScreen />} />
-              <Route path="/decks/:deckId" element={<DeckDetailScreen />} />
-              <Route path="/decks/:deckId/edit" element={<DeckEditorScreen />} />
-              <Route path="/study/pick" element={<DeckPickerScreen />} />
-              <Route path="/study" element={<StudyScreen />} />
-              <Route path="/decks/:deckId/study" element={<StudyScreen />} />
-              <Route path="/decks/:deckId/exam" element={<ExamScreen />} />
-              <Route path="/decks/:deckId/cards/new" element={<CardEditorScreen />} />
-              <Route path="/decks/:deckId/cards/:cardId" element={<CardEditorScreen />} />
-              <Route path="/import" element={<ImportExportScreen />} />
-              <Route path="/generate" element={<AIGenerateScreen />} />
-              <Route path="/unlock" element={<DonationScreen />} />
-              <Route path="/settings" element={<SettingsScreen />} />
-              <Route path="/decks/:deckId/stats" element={<StatsScreen />} />
-              <Route path="/stats" element={<StatsScreen />} />
-              <Route path="*" element={<NotFoundScreen />} />
-            </Route>
-          </Routes>
-        </Router>
-      </MotionConfig>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider theme={theme} reduceMotion={reduceMotion}>
+        <MotionConfig reducedMotion={reduceMotion ? 'always' : 'user'}>
+          <Router>
+            <Routes>
+              <Route path="/onboarding" element={<OnboardingScreen />} />
+              <Route element={<Layout fab={<QuickAddFAB />} />}>
+                <Route path="/" element={<GateRoute><HomeScreen /></GateRoute>} />
+                <Route path="/decks" element={<DecksScreen />} />
+                <Route path="/decks/:deckId" element={<DeckDetailScreen />} />
+                <Route path="/decks/:deckId/edit" element={<DeckEditorScreen />} />
+                <Route path="/study/pick" element={<DeckPickerScreen />} />
+                <Route path="/study" element={<StudyScreen />} />
+                <Route path="/decks/:deckId/study" element={<StudyScreen />} />
+                <Route path="/decks/:deckId/exam" element={<ExamScreen />} />
+                <Route path="/decks/:deckId/cards/new" element={<CardEditorScreen />} />
+                <Route path="/decks/:deckId/cards/:cardId" element={<CardEditorScreen />} />
+                <Route path="/import" element={<ImportExportScreen />} />
+                <Route path="/generate" element={<AIGenerateScreen />} />
+                <Route path="/unlock" element={<DonationScreen />} />
+                <Route path="/settings" element={<SettingsScreen />} />
+                <Route path="/decks/:deckId/stats" element={<StatsScreen />} />
+                <Route path="/stats" element={<StatsScreen />} />
+                <Route path="*" element={<NotFoundScreen />} />
+              </Route>
+            </Routes>
+          </Router>
+        </MotionConfig>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
