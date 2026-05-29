@@ -8,10 +8,20 @@ import { Field } from '../components/ui/Field';
 import { Select } from '../components/ui/Select';
 import styles from './ImportExportScreen.module.css';
 
+function readFile(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsText(file);
+  });
+}
+
 export function ImportExportScreen() {
   const decks = useStore((s) => s.decks);
   const [raw, setRaw] = useState('');
   const [deckId, setDeckId] = useState('');
+  const [dragOver, setDragOver] = useState(false);
   const result = useMemo(() => parseImport(raw), [raw]);
   const target = deckId || decks[0]?.id || '';
 
@@ -35,6 +45,25 @@ export function ImportExportScreen() {
     URL.revokeObjectURL(url);
   }
 
+  async function handleFile(file: File) {
+    const text = await readFile(file);
+    setRaw(text);
+  }
+
+  function onDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files[0];
+    if (file && (file.name.endsWith('.json') || file.name.endsWith('.csv'))) {
+      handleFile(file);
+    }
+  }
+
+  function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.files?.[0];
+    if (file) handleFile(file);
+  }
+
   return (
     <section>
       <BackLink to="/" label="Home" />
@@ -47,6 +76,26 @@ export function ImportExportScreen() {
         onChange={(v) => setDeckId(v)}
         options={decks.map((d) => ({ value: d.id, label: d.name }))}
       />
+
+      <div
+        className={`${styles.dropZone} ${dragOver ? styles.dropZoneActive : ''}`}
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={onDrop}
+        onClick={() => document.getElementById('fileInput')?.click()}
+      >
+        <span className={styles.dropIcon}>📂</span>
+        <span>Drop a backup file here or click to browse</span>
+        <input
+          id="fileInput"
+          type="file"
+          accept=".json,.csv"
+          style={{ display: 'none' }}
+          onChange={onFileChange}
+        />
+      </div>
+
+      <div className={styles.orSep}>or paste below</div>
 
       <Field label="Paste cards (CSV, Front | Back, or cloze)" htmlFor="paste">
         <textarea id="paste" className={styles.textarea} value={raw} onChange={(e) => setRaw(e.target.value)} />
