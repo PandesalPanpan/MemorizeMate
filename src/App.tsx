@@ -17,6 +17,7 @@ import { DeckPickerScreen } from './screens/DeckPickerScreen';
 import { StatsScreen } from './screens/StatsScreen';
 import { AIGenerateScreen } from './screens/AIGenerateScreen';
 import { DonationScreen } from './screens/DonationScreen';
+import { NotFoundScreen } from './screens/NotFoundScreen';
 import { LandingScreen } from './screens/LandingScreen';
 import { OnboardingScreen } from './screens/OnboardingScreen';
 import { useStore, store } from './store/useStore';
@@ -73,6 +74,7 @@ export function App() {
               <Route path="/settings" element={<SettingsScreen />} />
               <Route path="/decks/:deckId/stats" element={<StatsScreen />} />
               <Route path="/stats" element={<StatsScreen />} />
+              <Route path="*" element={<NotFoundScreen />} />
             </Route>
           </Routes>
         </Router>
