@@ -47,6 +47,16 @@ export function SearchScreen() {
   const deckMap = new Map(allDecks.map((d) => [d.id, d]));
   const hasResults = cards.length > 0 || matchedDecks.length > 0;
 
+  // Compute per-deck card counts from allCards
+  const [allCards, setAllCards] = useState<Card[]>([]);
+  useEffect(() => {
+    store.getState().repo.listCards().then(setAllCards);
+  }, []);
+  const deckCardCounts = new Map<string, number>();
+  for (const c of allCards) {
+    deckCardCounts.set(c.deckId, (deckCardCounts.get(c.deckId) ?? 0) + 1);
+  }
+
   return (
     <section>
       <h2>Search</h2>
@@ -89,7 +99,7 @@ export function SearchScreen() {
                       <span className={styles.colorDot} style={{ background: `var(--deck-${deck.color})` }} />
                       <span className={styles.deckName}>{deck.name}</span>
                       <span className={styles.cardCount}>
-                        {deckMap.has(deck.id) ? '…' : ''}
+                        {deckCardCounts.get(deck.id) ?? 0} {((deckCardCounts.get(deck.id) ?? 0) === 1) ? 'card' : 'cards'}
                       </span>
                     </Link>
                   </li>
