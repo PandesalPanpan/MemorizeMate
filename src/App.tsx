@@ -23,6 +23,7 @@ const LandingScreen = lazy(() => import('./screens/LandingScreen').then(m => ({ 
 const OnboardingScreen = lazy(() => import('./screens/OnboardingScreen').then(m => ({ default: m.OnboardingScreen })));
 const NotFoundScreen = lazy(() => import('./screens/NotFoundScreen').then(m => ({ default: m.NotFoundScreen })));
 import { ErrorToast } from './components/ErrorToast';
+import { UpdateToast } from './components/UpdateToast';
 import { useStore, store } from './store/useStore';
 import { setBadge, scheduleReminder } from './services/notifications';
 import { isDue } from './fsrs/scheduler';
@@ -58,6 +59,7 @@ export function App() {
     <ErrorBoundary>
       <ThemeProvider theme={theme} reduceMotion={reduceMotion}>
         <ErrorToast />
+        <UpdateToast />
         <MotionConfig reducedMotion={reduceMotion ? 'always' : 'user'}>
           <Router>
             <Suspense fallback={<LoadingSpinner />}>
