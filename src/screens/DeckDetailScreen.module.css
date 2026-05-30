@@ -1,3 +1,19 @@
 .head { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-md); }
 .meta { color: var(--color-muted); margin-top: 2px; }
 .actions { display: flex; gap: var(--space-sm); flex-wrap: wrap; margin-bottom: var(--space-xl); }
+.searchInput { position: relative; margin-bottom: var(--space-md); }
+.searchInput input {
+  width: 100%;
+  padding: 10px 14px 10px 36px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  transition: border-color var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease);
+}
+.searchInput input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-wash);
+}
+.searchIcon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--color-muted); pointer-events: none; }

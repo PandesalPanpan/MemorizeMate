@@ -37,6 +37,9 @@ export interface Repository {
   getLives(): Promise<LivesState>;
   putLives(lives: LivesState): Promise<void>;
 
+  // search
+  searchCards(query: string, deckId?: string): Promise<Card[]>;
+
   // bulk (import/restore)
   importBackup(decks: Deck[], cards: Card[]): Promise<void>;
 }

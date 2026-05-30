@@ -18,6 +18,7 @@ const ExamScreen = lazy(() => import('./screens/ExamScreen').then(m => ({ defaul
 const DeckPickerScreen = lazy(() => import('./screens/DeckPickerScreen').then(m => ({ default: m.DeckPickerScreen })));
 const StatsScreen = lazy(() => import('./screens/StatsScreen').then(m => ({ default: m.StatsScreen })));
 const AIGenerateScreen = lazy(() => import('./screens/AIGenerateScreen').then(m => ({ default: m.AIGenerateScreen })));
+const SearchScreen = lazy(() => import('./screens/SearchScreen').then(m => ({ default: m.SearchScreen })));
 const DonationScreen = lazy(() => import('./screens/DonationScreen').then(m => ({ default: m.DonationScreen })));
 const LandingScreen = lazy(() => import('./screens/LandingScreen').then(m => ({ default: m.LandingScreen })));
 const OnboardingScreen = lazy(() => import('./screens/OnboardingScreen').then(m => ({ default: m.OnboardingScreen })));
@@ -76,6 +77,7 @@ export function App() {
                 <Route path="/decks/:deckId/exam" element={<ExamScreen />} />
                 <Route path="/decks/:deckId/cards/new" element={<CardEditorScreen />} />
                 <Route path="/decks/:deckId/cards/:cardId" element={<CardEditorScreen />} />
+                <Route path="/search" element={<SearchScreen />} />
                 <Route path="/import" element={<ImportExportScreen />} />
                 <Route path="/generate" element={<AIGenerateScreen />} />
                 <Route path="/unlock" element={<DonationScreen />} />

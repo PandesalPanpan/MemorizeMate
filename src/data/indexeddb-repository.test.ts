@@ -14,6 +14,10 @@ function mkReviewLog(id: string, cardId: string): ReviewLog {
   return { id, cardId, timestamp: 0, rating: 'good', elapsedDays: 0, scheduledDays: 0 };
 }
 
+function mkCardFull(id: string, deckId: string, front: string, back: string): Card {
+  return { id, deckId, type: 'basic', front, back, tags: [], srs: newCard(new Date(0)), lapses: 0, leech: false, createdAt: 0 };
+}
+
 describe('IndexedDbRepository', () => {
   let repo: IndexedDbRepository;
   beforeEach(async () => {
@@ -75,5 +79,36 @@ describe('IndexedDbRepository', () => {
     expect(bLogs[0].id).toBe('r2');
     const cLogs = await repo.listReviewLogsByCard('card-nonexistent');
     expect(cLogs).toHaveLength(0);
+  });
+
+  it('searches cards by front and back text', async () => {
+    await repo.putCard(mkCardFull('c1', 'd1', 'Mitochondria', 'powerhouse of the cell'));
+    await repo.putCard(mkCardFull('c2', 'd1', 'Chloroplast', 'photosynthesis'));
+    await repo.putCard(mkCardFull('c3', 'd2', 'Atom', 'smallest unit of matter'));
+    const results = await repo.searchCards('mito');
+    expect(results).toHaveLength(1);
+    expect(results[0].id).toBe('c1');
+  });
+
+  it('searches cards by back text', async () => {
+    await repo.putCard(mkCardFull('c1', 'd1', 'Q1', 'photosynthesis'));
+    await repo.putCard(mkCardFull('c2', 'd1', 'Q2', 'respiration'));
+    const results = await repo.searchCards('photosynthesis');
+    expect(results).toHaveLength(1);
+    expect(results[0].id).toBe('c1');
+  });
+
+  it('searches cards within a specific deck', async () => {
+    await repo.putCard(mkCardFull('c1', 'd1', 'Hello', 'World'));
+    await repo.putCard(mkCardFull('c2', 'd2', 'Hello', 'there'));
+    const results = await repo.searchCards('hello', 'd1');
+    expect(results).toHaveLength(1);
+    expect(results[0].id).toBe('c1');
+  });
+
+  it('returns empty array when nothing matches', async () => {
+    await repo.putCard(mkCardFull('c1', 'd1', 'Hello', 'World'));
+    const results = await repo.searchCards('zzz_nonexistent');
+    expect(results).toHaveLength(0);
   });
 });

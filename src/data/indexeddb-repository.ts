@@ -94,6 +94,14 @@ export class IndexedDbRepository implements Repository {
     await (await this.dbp).put('settings', lives, LIVES_KEY);
   }
 
+  async searchCards(query: string, deckId?: string): Promise<Card[]> {
+    const cards = await this.listCards(deckId);
+    const q = query.toLowerCase();
+    return cards.filter(c =>
+      c.front.toLowerCase().includes(q) || c.back.toLowerCase().includes(q)
+    );
+  }
+
   async importBackup(decks: Deck[], cards: Card[]): Promise<void> {
     const db = await this.dbp;
     const tx = db.transaction(['decks', 'cards'], 'readwrite');

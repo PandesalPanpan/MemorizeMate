@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Pencil } from 'lucide-react';
+import { Pencil, Search } from 'lucide-react';
 import { store } from '../store/useStore';
 import { BackLink } from '../components/BackLink';
 import { Button } from '../components/ui/Button';
@@ -15,6 +15,7 @@ export function DeckDetailScreen() {
   const [deck, setDeck] = useState<Deck | undefined>();
   const [cards, setCards] = useState<Card[]>([]);
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const reload = useCallback(() => {
     if (!deckId) return;
@@ -23,6 +24,13 @@ export function DeckDetailScreen() {
   }, [deckId]);
 
   useEffect(() => { reload(); }, [reload]);
+
+  const filtered = searchQuery
+    ? cards.filter(c =>
+        c.front.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        c.back.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : cards;
 
   if (!deck) return <p>Loading…</p>;
   const pending = cards.find((c) => c.id === pendingDelete);
@@ -49,7 +57,17 @@ export function DeckDetailScreen() {
         </Link>
       </div>
 
-      <CardList deckId={deck.id} cards={cards} onDelete={(id) => setPendingDelete(id)} />
+      <div className={styles.searchInput}>
+        <Search size={16} className={styles.searchIcon} />
+        <input
+          type="text"
+          placeholder="Search cards…"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+
+      <CardList deckId={deck.id} cards={filtered} onDelete={(id) => setPendingDelete(id)} />
 
       {pending && (
         <ConfirmDialog
