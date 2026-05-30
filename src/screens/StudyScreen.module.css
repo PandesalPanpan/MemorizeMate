@@ -11,3 +11,15 @@
 .deckDot { width: 10px; height: 10px; border-radius: var(--radius-pill); }
 .deckTagName { font-size: var(--step--1); color: var(--color-text-soft); font-weight: 500; }
 .dashboard { display: flex; gap: var(--space-md); justify-content: center; flex-wrap: wrap; margin-top: var(--space-xl); }
+.limitWarning {
+  background: var(--color-surface-raised, #fef9e7);
+  border: 1px solid var(--color-warning, #e6a817);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  margin-bottom: var(--space-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  font-size: var(--step-0);
+}

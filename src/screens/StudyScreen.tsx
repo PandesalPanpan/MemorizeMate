@@ -44,6 +44,11 @@ export function StudyScreen() {
   const deckIdsRef = useRef<string[]>([]);
   const sessionEndingRef = useRef(false);
   const locked = isLocked(lives, Date.now());
+  const [limitDismissed, setLimitDismissed] = useState(false);
+  const [newCardsToday, setNewCardsToday] = useState(0);
+  const [reviewsToday, setReviewsToday] = useState(0);
+  const [newCardsLimit, setNewCardsLimit] = useState(0);
+  const [reviewsLimit, setReviewsLimit] = useState(0);
 
   useEffect(() => {
     if (locked) return;
@@ -64,6 +69,40 @@ export function StudyScreen() {
         if (d) dm.set(d.id, { name: d.name, color: d.color });
       }
       setDeckMap(dm);
+
+      // Check daily limits
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const todayStartMs = todayStart.getTime();
+
+      const newCardIds = new Set(cards.filter((c) => c.srs.reps === 0).map((c) => c.id));
+      const reviewCardIds = new Set(cards.filter((c) => c.srs.reps > 0).map((c) => c.id));
+
+      let newC = 0;
+      let revC = 0;
+      let newL = 0;
+      let revL = 0;
+
+      for (const id of ids) {
+        const d = await store.getState().repo.getDeck(id);
+        if (!d) continue;
+        if (d.newCardsPerDay) newL = Math.max(newL, d.newCardsPerDay);
+        if (d.reviewsPerDay) revL = Math.max(revL, d.reviewsPerDay);
+
+        const logs = await store.getState().repo.listReviewLogsByDeck(id);
+        for (const log of logs) {
+          if (log.timestamp < todayStartMs) continue;
+          if (newCardIds.has(log.cardId)) newC++;
+          if (reviewCardIds.has(log.cardId)) revC++;
+        }
+      }
+
+      setNewCardsToday(newC);
+      setReviewsToday(revC);
+      setNewCardsLimit(newL);
+      setReviewsLimit(revL);
+      setLimitDismissed(false);
+
       const now = Date.now();
       const sessionEntries = cards.map((c) => createSessionEntry(c.id, now));
       setEntries(sessionEntries);
@@ -158,6 +197,14 @@ export function StudyScreen() {
 
   const { q, a } = front(card);
   const remaining = entries.filter((e) => !e.graduated).length;
+  const showNewWarning = newCardsLimit > 0 && newCardsToday >= newCardsLimit && !limitDismissed;
+  const showReviewWarning = reviewsLimit > 0 && reviewsToday >= reviewsLimit && !limitDismissed;
+
+  function renderLimitWarning() {
+    if (showNewWarning) return `⚠ You've reviewed ${newCardsToday}/${newCardsLimit} new cards today`;
+    if (showReviewWarning) return `⚠ You've completed ${reviewsToday}/${reviewsLimit} reviews today`;
+    return null;
+  }
 
   async function onGrade(r: Rating) {
     if (!current) return;
@@ -188,6 +235,12 @@ export function StudyScreen() {
           <span className={styles.count}>{remaining} left</span>
         </div>
       </div>
+      {(showNewWarning || showReviewWarning) && (
+        <div className={styles.limitWarning}>
+          <span>{renderLimitWarning()}</span>
+          <Button variant="ghost" size="sm" onClick={() => setLimitDismissed(true)}>Continue anyway</Button>
+        </div>
+      )}
       {deckIdsRef.current.length > 1 && (() => {
         const di = deckMap.get(card.deckId);
         return di ? (

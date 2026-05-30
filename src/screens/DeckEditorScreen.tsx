@@ -17,6 +17,8 @@ export function DeckEditorScreen() {
   const [description, setDescription] = useState('');
   const [color, setColor] = useState<DeckColor>('terracotta');
   const [retention, setRetention] = useState(0.9);
+  const [newCardsPerDay, setNewCardsPerDay] = useState('');
+  const [reviewsPerDay, setReviewsPerDay] = useState('');
   const [showDelete, setShowDelete] = useState(false);
   const [showArchive, setShowArchive] = useState(false);
 
@@ -29,18 +31,24 @@ export function DeckEditorScreen() {
       setDescription(d.description);
       setColor(d.color);
       setRetention(d.desiredRetention);
+      setNewCardsPerDay(d.newCardsPerDay ? String(d.newCardsPerDay) : '');
+      setReviewsPerDay(d.reviewsPerDay ? String(d.reviewsPerDay) : '');
     });
   }, [deckId]);
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
     if (!deck) return;
+    const n = newCardsPerDay ? Number(newCardsPerDay) : undefined;
+    const r = reviewsPerDay ? Number(reviewsPerDay) : undefined;
     await store.getState().updateDeck({
       ...deck,
       name: name.trim(),
       description: description.trim(),
       color,
       desiredRetention: retention,
+      newCardsPerDay: n,
+      reviewsPerDay: r,
     });
     nav(`/decks/${deck.id}`);
   }
@@ -68,6 +76,26 @@ export function DeckEditorScreen() {
             step={0.01}
             value={retention}
             onChange={(e) => setRetention(Number(e.target.value))}
+          />
+        </Field>
+        <Field label="New cards per day" htmlFor="newPerDay">
+          <input
+            id="newPerDay"
+            type="number"
+            min={0}
+            placeholder="Unlimited"
+            value={newCardsPerDay}
+            onChange={(e) => setNewCardsPerDay(e.target.value)}
+          />
+        </Field>
+        <Field label="Reviews per day" htmlFor="reviewsPerDay">
+          <input
+            id="reviewsPerDay"
+            type="number"
+            min={0}
+            placeholder="Unlimited"
+            value={reviewsPerDay}
+            onChange={(e) => setReviewsPerDay(e.target.value)}
           />
         </Field>
         <div className={styles.actions}>

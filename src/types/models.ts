@@ -42,6 +42,8 @@ export interface Deck {
   color: DeckColor;
   icon?: string;        // emoji or icon name
   desiredRetention: number; // 0.7 - 0.97
+  newCardsPerDay?: number;
+  reviewsPerDay?: number;
   createdAt: number;   // epoch ms
   archived?: boolean;
 }
