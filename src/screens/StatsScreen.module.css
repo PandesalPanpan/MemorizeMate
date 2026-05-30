@@ -29,3 +29,9 @@
 .sessionDate { font-weight: 600; }
 .sessionMeta { font-size: var(--step--1); color: var(--color-muted); font-family: var(--font-mono); margin-top: 2px; }
 .empty { color: var(--color-muted); }
+.forecast { margin-bottom: var(--space-xl); }
+.forecast h3 { margin-bottom: var(--space-md); }
+.forecastToggle { display: flex; gap: 6px; margin-bottom: var(--space-md); }
+.forecastBtn,
+.forecastActive { padding: 4px 12px; border: 1px solid var(--color-line); border-radius: var(--radius-pill); font-size: var(--step--1); cursor: pointer; background: var(--color-surface); color: var(--color-text-soft); }
+.forecastActive { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }

@@ -1,0 +1,45 @@
+.chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  min-height: 120px;
+  padding: var(--space-md) 0;
+}
+
+.barCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.count {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.bar {
+  width: 100%;
+  max-width: 32px;
+  min-height: 4px;
+  background: var(--color-accent);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  transition: height 0.2s ease;
+}
+
+.label {
+  font-size: var(--step--2);
+  color: var(--color-muted);
+  text-align: center;
+  line-height: 1.2;
+  word-break: keep-all;
+}
+
+.empty {
+  color: var(--color-muted);
+  font-style: italic;
+  padding: var(--space-md) 0;
+}
