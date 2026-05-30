@@ -29,8 +29,8 @@ npm run build      # type-check + production build
 ### Docker
 
 ```bash
-docker compose up dev    # hot-reload dev server
-docker compose up prod   # nginx-served production build
+docker compose -f docker-compose.dev.yml up --build   # hot-reload dev server
+docker compose -f docker-compose.prod.yml up --build  # nginx-served production build
 ```
 
 ## Tech Stack

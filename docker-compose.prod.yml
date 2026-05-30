@@ -1,0 +1,10 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: prod
+    ports:
+      - "${PROD_PORT:-8080}:80"
+    env_file:
+      - .env
