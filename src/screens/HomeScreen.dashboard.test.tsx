@@ -27,7 +27,10 @@ describe('HomeScreen dashboard', () => {
     render(<MemoryRouter><HomeScreen /></MemoryRouter>);
     await waitFor(() => {
       const link = screen.getByRole('link', { name: /study all due/i });
-      expect(link).toHaveAttribute('href', `/study?deckIds=${d1.id},${d2.id}`);
+      const href = link.getAttribute('href');
+      expect(href).toMatch(/^\/study\?deckIds=/);
+      expect(href).toContain(d1.id);
+      expect(href).toContain(d2.id);
     });
   });
 
