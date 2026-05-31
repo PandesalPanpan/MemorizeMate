@@ -6,10 +6,15 @@ import { requestPermission } from '../services/notifications';
 import type { Deck } from '../types/models';
 import styles from './SettingsScreen.module.css';
 
-function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
+function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
     <span className={styles.switch}>
-      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} />
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        aria-label={label}
+      />
       <span className={styles.track} aria-hidden />
     </span>
   );
@@ -35,7 +40,7 @@ export function SettingsScreen() {
         </div>
         <div className={styles.row}>
           <span className={styles.rowLabel}>Reduce motion</span>
-          <Toggle checked={settings.reduceMotion} onChange={(v) => set({ reduceMotion: v })} />
+          <Toggle label="Reduce motion" checked={settings.reduceMotion} onChange={(v) => set({ reduceMotion: v })} />
         </div>
       </div>
 
@@ -43,11 +48,13 @@ export function SettingsScreen() {
         <div className={styles.groupTitle}>Study</div>
         <div className={styles.row}>
           <span className={styles.rowLabel}>Sound cues</span>
-          <Toggle checked={settings.soundEnabled} onChange={(v) => set({ soundEnabled: v })} />
+          <Toggle label="Sound cues" checked={settings.soundEnabled} onChange={(v) => set({ soundEnabled: v })} />
         </div>
         <div className={styles.row}>
           <span className={styles.rowLabel}>Daily review reminder</span>
-          <Toggle checked={settings.notifications.enabled} onChange={async (v) => {
+          <Toggle
+            label="Daily review reminder"
+            checked={settings.notifications.enabled} onChange={async (v) => {
             if (v) await requestPermission();
             set({ notifications: { ...settings.notifications, enabled: v } });
           }} />
