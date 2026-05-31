@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { RATINGS, type Rating } from '../types/models';
 import { playCue } from '../services/sound';
@@ -15,6 +15,13 @@ const META: Record<Rating, { label: string; key: string; cls: string }> = {
 export function CardFlip({ question, answer, onGrade }: { question: string; answer: string; onGrade: (r: Rating) => void }) {
   const [revealed, setRevealed] = useState(false);
   const soundEnabled = useStore((s) => s.settings.soundEnabled);
+  const firstRatingRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (revealed) {
+      firstRatingRef.current?.focus();
+    }
+  }, [revealed]);
 
   const submit = useCallback((r: Rating) => {
     playCue(r === 'again' ? 'wrong' : 'correct', { soundEnabled });
@@ -62,8 +69,8 @@ export function CardFlip({ question, answer, onGrade }: { question: string; answ
         </button>
       ) : (
         <div className={styles.grades}>
-          {RATINGS.map((r) => (
-            <button key={r} className={`${styles.grade} ${META[r].cls}`} onClick={() => submit(r)} aria-label={`Rate as ${META[r].label} (key ${META[r].key})`}>
+          {RATINGS.map((r, i) => (
+            <button key={r} ref={i === 0 ? firstRatingRef : undefined} className={`${styles.grade} ${META[r].cls}`} onClick={() => submit(r)} aria-label={`Rate as ${META[r].label} (key ${META[r].key})`}>
               {META[r].label}
               <span className={styles.key}>{META[r].key}</span>
             </button>
