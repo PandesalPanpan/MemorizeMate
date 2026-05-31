@@ -27,10 +27,9 @@ export function DeckDetailScreen() {
 
   useEffect(() => { reload(); }, [reload]);
 
-  async function handleExport() {
+  function handleExport() {
     if (!deck) return;
-    const allCards = await store.getState().repo.listCards(deck.id);
-    const data = exportDecks([deck], allCards, [deck.id], 'json');
+    const data = exportDecks([deck], cards, [deck.id], 'json');
     const blob = new Blob([data], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
