@@ -16,6 +16,7 @@ test('create deck, add a card, study it', async ({ page }) => {
   await expect(page.getByText('Capital of France')).toBeVisible();
   await page.getByRole('button', { name: /show answer/i }).click();
   await expect(page.getByText('Paris')).toBeVisible();
-  await page.getByRole('button', { name: /good/i }).click();
+  // Rate "Easy" to graduate immediately (new cards rated "Good" go to FSRS learning steps)
+  await page.getByRole('button', { name: /easy/i }).click();
   await expect(page.getByText(/all done/i)).toBeVisible();
 });

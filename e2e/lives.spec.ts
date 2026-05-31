@@ -18,6 +18,9 @@ test('running out of lives locks study, donation page unlocks', async ({ page })
   await expect(page.getByText(/out of lives/i)).toBeVisible();
   await page.getByRole('link', { name: /unlock now/i }).click();
   await expect(page.getByText(/0976 429 5810/)).toBeVisible();
-  await page.getByRole('button', { name: /unlock without donating/i }).click();
-  await expect(page).toHaveURL(/\/decks/);
+  // Donation screen now has a form — enter 0 to skip donation
+  await page.getByLabel(/how much/i).fill('0');
+  await page.getByRole('button', { name: /unlock lives/i }).click();
+  // DonationScreen navigates to home (/) after unlock
+  await expect(page).toHaveURL(/^http:\/\/localhost:5180\/$/);
 });
