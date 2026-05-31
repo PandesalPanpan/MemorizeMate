@@ -8,6 +8,7 @@ import { Monogram } from '../components/Monogram';
 import { CardList } from '../components/CardList';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import type { Card, Deck } from '../types/models';
+import { exportDecks } from '../exporter/exporter';
 import styles from './DeckDetailScreen.module.css';
 
 export function DeckDetailScreen() {
@@ -25,6 +26,19 @@ export function DeckDetailScreen() {
   }, [deckId]);
 
   useEffect(() => { reload(); }, [reload]);
+
+  async function handleExport() {
+    if (!deck) return;
+    const allCards = await store.getState().repo.listCards(deck.id);
+    const data = exportDecks([deck], allCards, [deck.id], 'json');
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${deck.name.replace(/\s+/g, '-').toLowerCase()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
   const filtered = cards.filter(c => {
     const matchesSearch = !searchQuery ||
@@ -55,6 +69,7 @@ export function DeckDetailScreen() {
         <Link to={`/decks/${deck.id}/exam`}><Button variant="outline">Exam</Button></Link>
         <Link to={`/decks/${deck.id}/stats`}><Button variant="outline">Stats</Button></Link>
         <Link to={`/decks/${deck.id}/cards/new`}><Button variant="outline">Add card</Button></Link>
+        <Button variant="outline" onClick={handleExport}>Export</Button>
         <Link to={`/decks/${deck.id}/edit`}>
           <Button variant="ghost" size="sm">
             <Pencil size={16} /> Edit

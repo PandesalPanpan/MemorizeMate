@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { DeckDetailScreen } from './DeckDetailScreen';
@@ -25,6 +25,7 @@ describe('DeckDetailScreen tag filtering', () => {
   beforeEach(() => {
     store.setState({ repo: new IndexedDbRepository('decktag-' + Math.random()) });
   });
+  afterEach(() => { vi.unstubAllGlobals(); });
 
   it('shows tag filter chips for deck tags', async () => {
     const repo = store.getState().repo;
@@ -140,5 +141,39 @@ describe('DeckDetailScreen tag filtering', () => {
 
     expect(screen.getByText('Mitochondria')).toBeInTheDocument();
     expect(screen.queryByText('Bacteria')).not.toBeInTheDocument();
+  });
+
+  it('exports just this deck as JSON when Export is clicked', async () => {
+    const captured: { current: string | null } = { current: null };
+    const realBlob = global.Blob;
+    vi.stubGlobal('Blob', class FakeBlob extends realBlob {
+      constructor(parts: BlobPart[], opts?: BlobPropertyBag) {
+        super(parts, opts);
+        captured.current = parts.map(String).join('');
+      }
+    });
+    vi.stubGlobal('URL', { ...URL, createObjectURL: () => 'blob:fake', revokeObjectURL: () => {} });
+
+    const repo = store.getState().repo;
+    await repo.putDeck(mkDeck('d1', 'Biology'));
+    await repo.putCard(mkCard('c1', 'd1', ['science'], 'Mitochondria'));
+
+    render(
+      <MemoryRouter initialEntries={['/decks/d1']}>
+        <Routes>
+          <Route path="/decks/:deckId" element={<DeckDetailScreen />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    await userEvent.click(await screen.findByRole('button', { name: /^export$/i }));
+
+    await waitFor(() => {
+      expect(captured.current).not.toBeNull();
+    });
+    const payload = JSON.parse(captured.current!);
+    expect(payload.decks).toHaveLength(1);
+    expect(payload.decks[0].id).toBe('d1');
+    expect(payload.cards.every((c: { deckId: string }) => c.deckId === 'd1')).toBe(true);
   });
 });
