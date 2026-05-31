@@ -5,7 +5,7 @@ import styles from './LivesIndicator.module.css';
 
 export function LivesIndicator({ current, lives }: { current: number; lives?: LivesState }) {
   return (
-    <span className={styles.wrap} aria-label={`${current} of ${INITIAL_LIVES} lives`}>
+    <span className={styles.wrap} aria-label={`${current} lives remaining`}>
       <Heart size={22} fill="var(--color-again)" stroke="var(--color-again)" />
       <span className={styles.count}>{current}</span>
       {lives && current < INITIAL_LIVES && <CountdownTimer lives={lives} />}

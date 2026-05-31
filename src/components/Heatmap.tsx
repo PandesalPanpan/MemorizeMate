@@ -12,7 +12,7 @@ const WEEKDAYS = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
 export function Heatmap({ counts, days = 168, today = new Date() }: { counts: Record<string, number>; days?: number; today?: Date }) {
   const { weeks, monthLabels } = buildCalendar(counts, days, today);
   return (
-    <div className={styles.wrap}>
+    <div className={styles.wrap} role="img" aria-label="Review activity heatmap">
       <div className={styles.months}>
         {monthLabels.map((m) => (
           <span key={`${m.label}-${m.colIndex}`} className={styles.month} style={{ gridColumnStart: m.colIndex + 2 }}>{m.label}</span>

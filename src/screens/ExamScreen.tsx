@@ -123,8 +123,8 @@ export function ExamScreen() {
       ) : (
         <>
           <div className={styles.actions}>
-            <Button onClick={() => answer(true)}>Got it right <span className={styles.key}>3</span></Button>
-            <Button variant="outline" onClick={() => answer(false)}>Got it wrong <span className={styles.key}>1</span></Button>
+            <Button onClick={() => answer(true)} aria-label="Got it right (key 3)">Got it right <span className={styles.key}>3</span></Button>
+            <Button variant="outline" onClick={() => answer(false)} aria-label="Got it wrong (key 1)">Got it wrong <span className={styles.key}>1</span></Button>
           </div>
           <div className={styles.keyHints}>
             <span className={styles.keyHint}><kbd>1</kbd> Wrong</span>

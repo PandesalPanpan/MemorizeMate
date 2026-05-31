@@ -35,7 +35,7 @@ export function CardFlip({ question, answer, onGrade }: { question: string; answ
   }, [revealed, submit]);
 
   return (
-    <div className={styles.wrap}>
+    <div className={styles.wrap} role="region" aria-label="Flashcard">
       <motion.div
         key={question}
         className={styles.card}
@@ -43,7 +43,7 @@ export function CardFlip({ question, answer, onGrade }: { question: string; answ
         animate={{ opacity: 1, y: 0, rotateX: 0 }}
         transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
       >
-        <p className={styles.prompt}>{question}</p>
+        <p className={styles.prompt} aria-live="polite">{question}</p>
         {revealed && (
           <motion.p
             className={styles.answer}
@@ -63,7 +63,7 @@ export function CardFlip({ question, answer, onGrade }: { question: string; answ
       ) : (
         <div className={styles.grades}>
           {RATINGS.map((r) => (
-            <button key={r} className={`${styles.grade} ${META[r].cls}`} onClick={() => submit(r)}>
+            <button key={r} className={`${styles.grade} ${META[r].cls}`} onClick={() => submit(r)} aria-label={`Rate as ${META[r].label} (key ${META[r].key})`}>
               {META[r].label}
               <span className={styles.key}>{META[r].key}</span>
             </button>

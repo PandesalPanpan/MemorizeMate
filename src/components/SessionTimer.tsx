@@ -26,14 +26,14 @@ export function SessionTimer({ startedAt }: { startedAt: number }) {
 
   if (!showTimer) {
     return (
-      <button className={styles.icon} onClick={toggle} aria-label="Show timer">
+      <button className={styles.icon} onClick={toggle} aria-live="off" aria-label="Session timer">
         <Clock size={16} />
       </button>
     );
   }
 
   return (
-    <button className={styles.timer} onClick={toggle} aria-label="Hide timer">
+    <button className={styles.timer} onClick={toggle} aria-live="off" aria-label="Session timer">
       <Clock size={14} />
       <span>{formatTime(elapsed)}</span>
     </button>
