@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SettingsScreen } from './SettingsScreen';
@@ -9,6 +9,10 @@ import { DEFAULT_SETTINGS } from '../types/models';
 describe('SettingsScreen', () => {
   beforeEach(() => {
     store.setState({ repo: new IndexedDbRepository('settings-' + Math.random()), settings: DEFAULT_SETTINGS });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it('toggles dark theme and persists it to the store', async () => {
