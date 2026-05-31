@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
@@ -16,6 +16,10 @@ describe('ImportExportScreen', () => {
     const other = await store.getState().createDeck({ name: 'History', description: '', color: 'terracotta' });
     deckId = deck.id;
     otherDeckId = other.id;
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   function captureBlob(): { current: string | null } {

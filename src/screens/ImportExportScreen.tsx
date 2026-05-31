@@ -168,41 +168,45 @@ export function ImportExportScreen() {
           <Button variant="outline" onClick={() => downloadAll('csv')}>Export CSV</Button>
         </div>
 
-        <h3 className={styles.subhead}>Export specific decks</h3>
-        <p className={styles.sectionHelp}>Share a deck with a friend or back up just a few.</p>
+        {activeDecks.length > 0 && (
+          <>
+            <h3 className={styles.subhead}>Export specific decks</h3>
+            <p className={styles.sectionHelp}>Share a deck with a friend or back up just a few.</p>
 
-        <label className={styles.selectAllRow}>
-          <input
-            type="checkbox"
-            aria-label="Select all"
-            checked={allSelected}
-            onChange={toggleSelectAll}
-          />
-          <span>Select all</span>
-        </label>
-
-        <div className={styles.deckList}>
-          {activeDecks.map((d) => (
-            <label key={d.id} className={styles.deckItem}>
+            <label className={styles.selectAllRow}>
               <input
                 type="checkbox"
-                aria-label={d.name}
-                checked={selected.has(d.id)}
-                onChange={() => toggleDeck(d.id)}
+                aria-label="Select all"
+                checked={allSelected}
+                onChange={toggleSelectAll}
               />
-              <span>{d.name}</span>
+              <span>Select all</span>
             </label>
-          ))}
-        </div>
 
-        <div className={styles.exportRow}>
-          <Button variant="outline" disabled={selected.size === 0} onClick={() => downloadSelected('json')}>
-            Export selected as JSON
-          </Button>
-          <Button variant="outline" disabled={selected.size === 0} onClick={() => downloadSelected('csv')}>
-            Export selected as CSV
-          </Button>
-        </div>
+            <div className={styles.deckList}>
+              {activeDecks.map((d) => (
+                <label key={d.id} className={styles.deckItem}>
+                  <input
+                    type="checkbox"
+                    aria-label={d.name}
+                    checked={selected.has(d.id)}
+                    onChange={() => toggleDeck(d.id)}
+                  />
+                  <span>{d.name}</span>
+                </label>
+              ))}
+            </div>
+
+            <div className={styles.exportRow}>
+              <Button variant="outline" disabled={selected.size === 0} onClick={() => downloadSelected('json')}>
+                Export selected as JSON
+              </Button>
+              <Button variant="outline" disabled={selected.size === 0} onClick={() => downloadSelected('csv')}>
+                Export selected as CSV
+              </Button>
+            </div>
+          </>
+        )}
       </div>
     </section>
   );
