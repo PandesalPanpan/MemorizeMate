@@ -67,15 +67,19 @@ export function ImportExportScreen() {
   return (
     <section>
       <BackLink to="/" label="Home" />
-      <h2>Import &amp; Export</h2>
 
-      <Select
-        id="deck"
-        label="Into deck"
-        value={target}
-        onChange={(v) => setDeckId(v)}
-        options={decks.map((d) => ({ value: d.id, label: d.name }))}
-      />
+      {/* Export — system-wide, so it comes first as its own clear section */}
+      <h2>Export backup</h2>
+      <p>Download all your decks and cards as a single file.</p>
+      <div className={styles.exportRow}>
+        <Button variant="outline" onClick={() => download('json')}>Export JSON</Button>
+        <Button variant="outline" onClick={() => download('csv')}>Export CSV</Button>
+      </div>
+
+      <hr className={styles.divider} />
+
+      {/* Import — paste first, see what you get, then choose where */}
+      <h2>Import cards</h2>
 
       <div
         className={`${styles.dropZone} ${dragOver ? styles.dropZoneActive : ''}`}
@@ -115,18 +119,20 @@ export function ImportExportScreen() {
               </div>
             ))}
           </div>
+
+          <Select
+            id="deck"
+            label="Into deck"
+            value={target}
+            onChange={(v) => setDeckId(v)}
+            options={decks.map((d) => ({ value: d.id, label: d.name }))}
+          />
+
+          <div className={styles.importBtn}>
+            <Button onClick={doImport}>Import {result.cards.length} cards</Button>
+          </div>
         </>
       )}
-
-      <Button onClick={doImport} disabled={!result.cards.length}>Import</Button>
-
-      <hr className={styles.divider} />
-
-      <h3>Export backup</h3>
-      <div className={styles.exportRow}>
-        <Button variant="outline" onClick={() => download('json')}>Export JSON</Button>
-        <Button variant="outline" onClick={() => download('csv')}>Export CSV</Button>
-      </div>
     </section>
   );
 }

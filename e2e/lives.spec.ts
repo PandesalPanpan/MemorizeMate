@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('running out of lives locks study, donation page unlocks', async ({ page }) => {
+  // Create a deck for the test
   await page.goto('/decks');
   await page.getByRole('button', { name: /new deck/i }).click();
   await page.getByLabel(/deck name/i).fill('Lives Deck');
@@ -16,6 +17,8 @@ test('running out of lives locks study, donation page unlocks', async ({ page })
   await page.getByRole('link', { name: /lives deck/i }).click();
   await page.getByRole('link', { name: /^study$/i }).click();
   await expect(page.getByText(/out of lives/i)).toBeVisible();
+
+  // Navigate to donation/unlock page
   await page.getByRole('link', { name: /unlock now/i }).click();
   await expect(page.getByText(/0976 429 5810/)).toBeVisible();
   // Donation screen now has a form — enter 0 to skip donation

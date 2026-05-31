@@ -60,11 +60,15 @@ export function AIGenerateScreen() {
       </Field>
       {result.cards.length > 0 && <p>{result.cards.length} cards detected — format: {result.format}</p>}
 
-      <Select id="aiDeck" label="Into deck" value={target} onChange={(v) => setDeckId(v)}
-        options={decks.map((d) => ({ value: d.id, label: d.name }))} />
-      <div className={styles.importBtn}>
-        <Button onClick={doImport} disabled={!result.cards.length}>Import</Button>
-      </div>
+      {result.cards.length > 0 && (
+        <>
+          <Select id="aiDeck" label="Into deck" value={target} onChange={(v) => setDeckId(v)}
+            options={decks.map((d) => ({ value: d.id, label: d.name }))} />
+          <div className={styles.importBtn}>
+            <Button onClick={doImport}>Import {result.cards.length} cards</Button>
+          </div>
+        </>
+      )}
     </section>
   );
 }

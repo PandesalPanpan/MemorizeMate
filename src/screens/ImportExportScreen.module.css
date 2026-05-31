@@ -18,3 +18,4 @@
 .dropIcon { font-size: var(--step-3); }
 .orSep { text-align: center; color: var(--color-muted); font-size: var(--step--1); margin: var(--space-md) 0; }
 .divider { height: 1px; background: var(--color-line); border: none; margin: var(--space-xl) 0; }
+.importBtn { margin-top: var(--space-md); }
