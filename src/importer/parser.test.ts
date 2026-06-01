@@ -16,10 +16,10 @@ describe('parseImport', () => {
     expect(r.cards[1]).toMatchObject({ type: 'basic', front: 'Largest planet', back: 'Jupiter' });
   });
 
-  it('detects CSV with header and optional tags', () => {
-    const r = parseImport('front,back,tags\nDog,Perro,"animals,spanish"');
+  it('detects CSV with header', () => {
+    const r = parseImport('front,back\nDog,Perro');
     expect(r.format).toBe('csv');
-    expect(r.cards[0]).toMatchObject({ type: 'basic', front: 'Dog', back: 'Perro', tags: ['animals', 'spanish'] });
+    expect(r.cards[0]).toMatchObject({ type: 'basic', front: 'Dog', back: 'Perro' });
   });
 
   it('reports parse errors for unrecognized empty input', () => {

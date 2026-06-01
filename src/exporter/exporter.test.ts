@@ -9,7 +9,7 @@ const deck: Deck = {
 };
 const card: Card = {
   id: 'c1', deckId: 'd1', type: 'basic', front: 'Dog', back: 'Perro',
-  tags: ['animals'], srs: newCard(new Date(0)), lapses: 0, leech: false, createdAt: 0,
+  srs: newCard(new Date(0)), lapses: 0, leech: false, createdAt: 0,
 };
 
 const deck2: Deck = {
@@ -18,7 +18,7 @@ const deck2: Deck = {
 };
 const cardD2: Card = {
   id: 'c2', deckId: 'd2', type: 'basic', front: '1492', back: 'Columbus',
-  tags: ['history'], srs: newCard(new Date(0)), lapses: 0, leech: false, createdAt: 0,
+  srs: newCard(new Date(0)), lapses: 0, leech: false, createdAt: 0,
 };
 
 describe('exporter', () => {
@@ -31,8 +31,8 @@ describe('exporter', () => {
 
   it('exports basic cards to CSV with header', () => {
     const csv = toCSV([card]);
-    expect(csv.split('\r\n')[0]).toBe('front,back,tags');
-    expect(csv).toContain('Dog,Perro,animals');
+    expect(csv.split('\r\n')[0]).toBe('front,back');
+    expect(csv).toContain('Dog,Perro');
   });
 
   it('exportDecks JSON includes only the selected deck and its cards', () => {
@@ -53,7 +53,7 @@ describe('exporter', () => {
 
   it('exportDecks CSV contains only the selected decks\' cards', () => {
     const csv = exportDecks([deck, deck2], [card, cardD2], ['d2'], 'csv');
-    expect(csv).toContain('1492,Columbus,history');
+    expect(csv).toContain('1492,Columbus');
     expect(csv).not.toContain('Dog');
   });
 
