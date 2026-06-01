@@ -4,7 +4,14 @@ services:
       context: .
       dockerfile: Dockerfile
       target: prod
-    ports:
-      - "${PROD_PORT:-8080}:80"
-    env_file:
-      - .env
+      args:
+        VITE_APP_NAME: ${VITE_APP_NAME}
+        VITE_PUSH_ENDPOINT: ${VITE_PUSH_ENDPOINT}
+    restart: unless-stopped
+    expose:
+      - "80"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

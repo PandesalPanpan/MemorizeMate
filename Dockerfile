@@ -1,6 +1,12 @@
 # --- build stage ---
 FROM node:20-alpine AS build
 WORKDIR /app
+
+ARG VITE_APP_NAME
+ARG VITE_PUSH_ENDPOINT
+ENV VITE_APP_NAME=$VITE_APP_NAME
+ENV VITE_PUSH_ENDPOINT=$VITE_PUSH_ENDPOINT
+
 COPY package*.json ./
 RUN npm ci
 COPY . .
