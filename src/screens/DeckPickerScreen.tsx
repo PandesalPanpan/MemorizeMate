@@ -5,7 +5,6 @@ import { isDue } from '../fsrs/scheduler';
 import { BackLink } from '../components/BackLink';
 import { Button } from '../components/ui/Button';
 import { Monogram } from '../components/Monogram';
-import type { Deck } from '../types/models';
 import styles from './DeckPickerScreen.module.css';
 
 export function DeckPickerScreen() {
@@ -53,7 +52,7 @@ export function DeckPickerScreen() {
                 checked={selected.has(d.id)}
                 onChange={() => toggle(d.id)}
               />
-              <Monogram name={d.name} color={d.color} size="sm" />
+              <Monogram name={d.name} color={d.color} size={28} />
               <span className={styles.name}>{d.name}</span>
               <span className={styles.due}>{dueByDeck[d.id] ?? 0} due</span>
             </label>
