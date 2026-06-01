@@ -3,6 +3,7 @@ import { useStore, store } from '../store/useStore';
 import { Button } from '../components/ui/Button';
 import { Select } from '../components/ui/Select';
 import { requestPermission } from '../services/notifications';
+import { canInstall, promptInstall } from '../services/pwa-install';
 import type { Deck } from '../types/models';
 import styles from './SettingsScreen.module.css';
 
@@ -72,10 +73,28 @@ export function SettingsScreen() {
         )}
       </div>
       <div className={styles.group}>
+        <div className={styles.groupTitle}>App</div>
+        <InstallAppRow />
+      </div>
+      <div className={styles.group}>
         <div className={styles.groupTitle}>Archived decks</div>
         <ArchivedDecks />
       </div>
     </section>
+  );
+}
+
+function InstallAppRow() {
+  const [ok, setOk] = useState(false);
+  useEffect(() => { setOk(canInstall()); }, []);
+  if (!ok) return null;
+  return (
+    <div className={styles.row}>
+      <span className={styles.rowLabel}>Install app</span>
+      <Button variant="outline" size="sm" onClick={async () => { await promptInstall(); setOk(canInstall()); }}>
+        Install
+      </Button>
+    </div>
   );
 }
 
