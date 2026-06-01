@@ -28,7 +28,7 @@ export function AIGenerateScreen() {
   async function doImport() {
     if (!target) return;
     for (const c of result.cards) {
-      await store.getState().addCard({ deckId: target, type: c.type, front: c.front, back: c.back, tags: c.tags });
+      await store.getState().addCard({ deckId: target, type: c.type, front: c.front, back: c.back });
     }
     setRaw('');
   }

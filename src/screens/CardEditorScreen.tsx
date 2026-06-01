@@ -34,7 +34,7 @@ export function CardEditorScreen() {
       if (existing) {
         await store.getState().updateCard({ ...existing, type, front, back: type === 'cloze' ? '' : back });
       } else {
-        await store.getState().addCard({ deckId, type, front, back: type === 'cloze' ? '' : back, tags: [] });
+        await store.getState().addCard({ deckId, type, front, back: type === 'cloze' ? '' : back });
       }
       nav(`/decks/${deckId}`);
     } catch { /* error already set in store */ }

@@ -17,7 +17,6 @@ export function DeckDetailScreen() {
   const [cards, setCards] = useState<Card[]>([]);
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTag, setSelectedTag] = useState('');
 
   const reload = useCallback(() => {
     if (!deckId) return;
@@ -43,12 +42,8 @@ export function DeckDetailScreen() {
     const matchesSearch = !searchQuery ||
       c.front.toLowerCase().includes(searchQuery.toLowerCase()) ||
       c.back.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesTag = !selectedTag || c.tags.includes(selectedTag);
-    return matchesSearch && matchesTag;
+    return matchesSearch;
   });
-
-  // Collect unique tags from the deck's cards
-  const deckTags = [...new Set(cards.flatMap(c => c.tags))].sort();
 
   if (!deck) return <p>Loading…</p>;
   const pending = cards.find((c) => c.id === pendingDelete);
@@ -85,26 +80,6 @@ export function DeckDetailScreen() {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
-
-      {deckTags.length > 0 && (
-        <div className={styles.tagFilter}>
-          <button
-            className={`${styles.tagPill} ${selectedTag === '' ? styles.tagPillActive : ''}`}
-            onClick={() => setSelectedTag('')}
-          >
-            All
-          </button>
-          {deckTags.map((tag) => (
-            <button
-              key={tag}
-              className={`${styles.tagPill} ${selectedTag === tag ? styles.tagPillActive : ''}`}
-              onClick={() => setSelectedTag(tag)}
-            >
-              {tag}
-            </button>
-          ))}
-        </div>
-      )}
 
       <CardList deckId={deck.id} cards={filtered} onDelete={(id) => setPendingDelete(id)} />
 

@@ -6,8 +6,8 @@ export function toJSON(decks: Deck[], cards: Card[]): string {
 }
 
 export function toCSV(cards: Card[]): string {
-  const rows = cards.map((c) => ({ front: c.front, back: c.back, tags: c.tags.join(',') }));
-  return Papa.unparse({ fields: ['front', 'back', 'tags'], data: rows });
+  const rows = cards.map((c) => ({ front: c.front, back: c.back }));
+  return Papa.unparse({ fields: ['front', 'back'], data: rows });
 }
 
 export function exportDecks(

@@ -29,7 +29,7 @@ export function OnboardingScreen() {
   async function addCard(e: React.FormEvent) {
     e.preventDefault();
     if (!front.trim()) return;
-    await store.getState().addCard({ deckId, type: 'basic', front: front.trim(), back: back.trim(), tags: [] });
+    await store.getState().addCard({ deckId, type: 'basic', front: front.trim(), back: back.trim() });
     setFront('');
     setBack('');
   }

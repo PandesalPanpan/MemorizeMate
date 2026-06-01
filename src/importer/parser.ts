@@ -6,7 +6,6 @@ export interface ParsedCard {
   type: 'basic' | 'cloze';
   front: string;
   back: string;
-  tags: string[];
 }
 
 export interface ImportResult {
@@ -28,7 +27,7 @@ export function parseImport(raw: string): ImportResult {
       format: 'cloze',
       cards: lines
         .filter((l) => CLOZE_RE.test(l))
-        .map((l) => ({ type: 'cloze', front: l, back: '', tags: [] })),
+        .map((l) => ({ type: 'cloze', front: l, back: '' })),
     };
   }
 
@@ -38,12 +37,12 @@ export function parseImport(raw: string): ImportResult {
       format: 'pipe',
       cards: lines.map((l) => {
         const [front, ...rest] = l.split('|');
-        return { type: 'basic', front: front.trim(), back: rest.join('|').trim(), tags: [] };
+        return { type: 'basic', front: front.trim(), back: rest.join('|').trim() };
       }),
     };
   }
 
-  // 3. CSV (front,back[,tags])
+  // 3. CSV (front,back)
   const parsed = Papa.parse<Record<string, string>>(text, { header: true, skipEmptyLines: true });
   if (parsed.data.length && parsed.meta.fields?.includes('front') && parsed.meta.fields?.includes('back')) {
     return {
@@ -52,7 +51,6 @@ export function parseImport(raw: string): ImportResult {
         type: 'basic',
         front: (row.front ?? '').trim(),
         back: (row.back ?? '').trim(),
-        tags: (row.tags ?? '').split(',').map((t) => t.trim()).filter(Boolean),
       })),
     };
   }
