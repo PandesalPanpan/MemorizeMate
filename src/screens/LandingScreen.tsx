@@ -15,7 +15,7 @@ export function LandingScreen() {
   return (
     <div className={styles.page}>
       <section className={styles.hero}>
-        <h1 className={styles.title}>MemorizeMate</h1>
+        <h1 className={styles.title}>Memorize<span className={styles.accent}>Mate</span></h1>
         <p className={styles.tagline}>
           The modern flashcard app that works offline, uses proven spaced repetition, and stays out of your way.
         </p>
