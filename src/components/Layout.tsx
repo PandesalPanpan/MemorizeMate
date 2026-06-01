@@ -5,6 +5,7 @@ import { useMediaQuery } from '../lib/useMediaQuery';
 import { Sidebar } from './nav/Sidebar';
 import { BottomNav } from './nav/BottomNav';
 import { LivesIndicator } from './LivesIndicator';
+import { InstallBanner } from './InstallBanner';
 import { useStore, store } from '../store/useStore';
 import styles from './Layout.module.css';
 
@@ -44,6 +45,7 @@ export function Layout({ fab }: { fab?: ReactNode }) {
         <Outlet />
       </motion.main>
       {fab}
+      <InstallBanner />
       {!isDesktop && <BottomNav />}
     </div>
   );
