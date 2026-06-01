@@ -21,7 +21,7 @@ export interface StoreState {
   createDeck(input: { name: string; description: string; color: DeckColor }): Promise<Deck>;
   updateDeck(deck: Deck): Promise<void>;
   removeDeck(deckId: string): Promise<void>;
-  addCard(input: { deckId: string; type: Card['type']; front: string; back: string; tags: string[] }): Promise<Card>;
+  addCard(input: { deckId: string; type: Card['type']; front: string; back: string }): Promise<Card>;
   dueCards(deckId: string, now: Date): Promise<Card[]>;
   reviewCard(cardId: string, rating: Rating, now: Date): Promise<void>;
   updateCard(card: Card): Promise<void>;
@@ -87,10 +87,10 @@ export function createStore(repo: Repository = defaultRepo) {
       } catch (e) { get()._setError(e); throw e; }
     },
 
-    async addCard({ deckId, type, front, back, tags }) {
+    async addCard({ deckId, type, front, back }) {
       try {
         const card: Card = {
-          id: id(), deckId, type, front, back, tags,
+          id: id(), deckId, type, front, back,
           srs: newCard(new Date()), lapses: 0, leech: false, createdAt: Date.now(),
         };
         await get().repo.putCard(card);

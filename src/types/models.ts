@@ -54,7 +54,6 @@ export interface Card {
   type: CardType;
   front: string;       // basic: question; cloze: source text with {{cN::}}
   back: string;        // basic: answer; cloze: unused ('')
-  tags: string[];
   srs: FsrsCard;       // ts-fsrs card (due/last_review are Date objects)
   lapses: number;      // mirror for quick leech checks
   leech: boolean;
