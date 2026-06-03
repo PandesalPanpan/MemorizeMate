@@ -8,7 +8,7 @@ import { DEFAULT_SETTINGS } from '../types/models';
 
 describe('SettingsScreen', () => {
   beforeEach(() => {
-    store.setState({ repo: new IndexedDbRepository('settings-' + Math.random()), settings: DEFAULT_SETTINGS });
+    store.setState({ repo: new IndexedDbRepository('settings-' + Math.random()), settings: { ...DEFAULT_SETTINGS } });
   });
 
   afterEach(() => {
@@ -45,9 +45,6 @@ describe('SettingsScreen', () => {
   });
 
   it('toggles Daily review reminder when its switch is clicked', async () => {
-    // Notifications API is not present in jsdom; the toggle handler awaits
-    // requestPermission() only when turning ON. Starting from OFF means it
-    // will be called — stub it on globalThis.
     vi.stubGlobal('Notification', {
       permission: 'granted',
       requestPermission: async () => 'granted' as NotificationPermission,
@@ -57,6 +54,46 @@ describe('SettingsScreen', () => {
     await userEvent.click(checkbox);
     await waitFor(() => {
       expect(store.getState().settings.notifications.enabled).toBe(true);
+    });
+  });
+
+  it('shows AM/PM time selectors when notifications are enabled', async () => {
+    vi.stubGlobal('Notification', {
+      permission: 'granted',
+      requestPermission: async () => 'granted' as NotificationPermission,
+    });
+    store.setState({
+      settings: {
+        ...store.getState().settings,
+        notifications: { enabled: true, reminderMinutes: 540 },
+      },
+    });
+    render(<SettingsScreen />);
+
+    expect(screen.getByLabelText('Hour')).toBeInTheDocument();
+    expect(screen.getByLabelText('Minute')).toBeInTheDocument();
+    expect(screen.getByLabelText('AM/PM')).toBeInTheDocument();
+  });
+
+  it('changes reminder time and persists to store', async () => {
+    vi.stubGlobal('Notification', {
+      permission: 'granted',
+      requestPermission: async () => 'granted' as NotificationPermission,
+    });
+    store.setState({
+      settings: {
+        ...store.getState().settings,
+        notifications: { enabled: true, reminderMinutes: 540 },
+      },
+    });
+    render(<SettingsScreen />);
+
+    await userEvent.selectOptions(screen.getByLabelText('Hour'), '2');
+    await userEvent.selectOptions(screen.getByLabelText('Minute'), '30');
+    await userEvent.selectOptions(screen.getByLabelText('AM/PM'), 'PM');
+
+    await waitFor(() => {
+      expect(store.getState().settings.notifications.reminderMinutes).toBe(14 * 60 + 30);
     });
   });
 });

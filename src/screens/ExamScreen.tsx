@@ -115,8 +115,14 @@ export function ExamScreen() {
     <section className={styles.page}>
       <div className={styles.count}>{i + 1} / {queue.length}</div>
       <div className={styles.card}>
-        <p className={styles.prompt}>{q}</p>
-        {revealed && <p className={styles.answer}>{a}</p>}
+        {card.type === 'cloze' ? (
+          <p className={styles.prompt}>{revealed ? a : q}</p>
+        ) : (
+          <>
+            <p className={styles.prompt}>{q}</p>
+            {revealed && <p className={styles.answer}>{a}</p>}
+          </>
+        )}
       </div>
       {!revealed ? (
         <Button onClick={() => setRevealed(true)}>Show answer</Button>

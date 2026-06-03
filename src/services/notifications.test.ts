@@ -10,11 +10,17 @@ describe('notifications service', () => {
     expect(await requestPermission()).toBe('granted');
   });
 
-  it('computes the delay to the next reminder hour', () => {
+  it('computes the delay to the next reminder time (minutes since midnight)', () => {
     const now = new Date('2026-05-30T08:00:00');
-    expect(nextReminderDelayMs(9, now)).toBe(60 * 60 * 1000); // 1 hour to 09:00
-    const afterHour = new Date('2026-05-30T10:00:00');
-    expect(nextReminderDelayMs(9, afterHour)).toBe(23 * 60 * 60 * 1000); // next day 09:00
+    expect(nextReminderDelayMs(9 * 60, now)).toBe(60 * 60 * 1000); // 1 hour to 09:00
+    const afterTime = new Date('2026-05-30T10:00:00');
+    expect(nextReminderDelayMs(9 * 60, afterTime)).toBe(23 * 60 * 60 * 1000); // next day 09:00
+  });
+
+  it('computes delay with minutes precision', () => {
+    const now = new Date('2026-05-30T14:22:00');
+    const delay = nextReminderDelayMs(14 * 60 + 30, now); // 14:30
+    expect(delay).toBe(8 * 60 * 1000); // 8 minutes
   });
 
   it('setBadge tolerates missing API', () => {

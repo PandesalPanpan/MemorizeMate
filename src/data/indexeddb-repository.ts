@@ -61,8 +61,15 @@ export class IndexedDbRepository implements Repository {
   }
 
   async getSettings(): Promise<Settings> {
-    const s = await (await this.dbp).get('settings', SETTINGS_KEY) as Settings | undefined;
-    return s ?? DEFAULT_SETTINGS;
+    const raw = await (await this.dbp).get('settings', SETTINGS_KEY) as Record<string, unknown> | undefined;
+    if (!raw) return DEFAULT_SETTINGS;
+    const ns = raw.notifications as Record<string, unknown> | undefined;
+    if (ns && typeof ns.reminderHour === 'number' && typeof ns.reminderMinutes !== 'number') {
+      ns.reminderMinutes = (ns.reminderHour as number) * 60;
+      delete ns.reminderHour;
+      await (await this.dbp).put('settings', raw as Settings, SETTINGS_KEY);
+    }
+    return raw as unknown as Settings;
   }
   async putSettings(settings: Settings): Promise<void> {
     await (await this.dbp).put('settings', settings as Settings | LivesState, SETTINGS_KEY);

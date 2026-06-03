@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { RATINGS, type Rating } from '../types/models';
+import { RATINGS, type Rating, type CardType } from '../types/models';
 import { playCue } from '../services/sound';
 import { useStore } from '../store/useStore';
 import styles from './CardFlip.module.css';
@@ -12,7 +12,12 @@ const META: Record<Rating, { label: string; key: string; cls: string }> = {
   easy: { label: 'Easy', key: '4', cls: styles.easy },
 };
 
-export function CardFlip({ question, answer, onGrade }: { question: string; answer: string; onGrade: (r: Rating) => void }) {
+export function CardFlip({ question, answer, onGrade, type }: {
+  question: string;
+  answer: string;
+  onGrade: (r: Rating) => void;
+  type?: CardType;
+}) {
   const [revealed, setRevealed] = useState(false);
   const soundEnabled = useStore((s) => s.settings.soundEnabled);
   const firstRatingRef = useRef<HTMLButtonElement>(null);
@@ -41,6 +46,8 @@ export function CardFlip({ question, answer, onGrade }: { question: string; answ
     return () => window.removeEventListener('keydown', onKey);
   }, [revealed, submit]);
 
+  const showInline = type === 'cloze';
+
   return (
     <div className={styles.wrap} role="region" aria-label="Flashcard">
       <motion.div
@@ -50,16 +57,31 @@ export function CardFlip({ question, answer, onGrade }: { question: string; answ
         animate={{ opacity: 1, y: 0, rotateX: 0 }}
         transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
       >
-        <p className={styles.prompt} aria-live="polite">{question}</p>
-        {revealed && (
+        {showInline ? (
           <motion.p
-            className={styles.answer}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.24 }}
+            className={styles.prompt}
+            aria-live="polite"
+            key={revealed ? 'a' : 'q'}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2 }}
           >
-            {answer}
+            {revealed ? answer : question}
           </motion.p>
+        ) : (
+          <>
+            <p className={styles.prompt} aria-live="polite">{question}</p>
+            {revealed && (
+              <motion.p
+                className={styles.answer}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.24 }}
+              >
+                {answer}
+              </motion.p>
+            )}
+          </>
         )}
       </motion.div>
 

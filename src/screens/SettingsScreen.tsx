@@ -21,6 +21,25 @@ function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: 
   );
 }
 
+function minutesToParts(minutes: number): { h12: number; min: number; am: boolean } {
+  const h24 = Math.floor(minutes / 60);
+  const min = minutes % 60;
+  const am = h24 < 12;
+  const h12 = h24 === 0 ? 12 : h24 > 12 ? h24 - 12 : h24;
+  return { h12, min, am };
+}
+
+function partsToMinutes(h12: number, min: number, am: boolean): number {
+  let h24 = am ? h12 : h12 + 12;
+  if (h12 === 12) h24 = am ? 0 : 12;
+  return h24 * 60 + min;
+}
+
+function formatTimeLabel(minutes: number): string {
+  const { h12, min, am } = minutesToParts(minutes);
+  return `${h12}:${String(min).padStart(2, '0')} ${am ? 'AM' : 'PM'}`;
+}
+
 export function SettingsScreen() {
   const settings = useStore((s) => s.settings);
   const set = store.getState().updateSettings;
@@ -60,17 +79,7 @@ export function SettingsScreen() {
             set({ notifications: { ...settings.notifications, enabled: v } });
           }} />
         </div>
-        {settings.notifications.enabled && (
-          <div className={styles.row}>
-            <Select
-              id="reminderHour"
-              label="Reminder time"
-              value={String(settings.notifications.reminderHour)}
-              onChange={(v) => set({ notifications: { ...settings.notifications, reminderHour: Number(v) } })}
-              options={Array.from({ length: 24 }, (_, h) => ({ value: String(h), label: `${String(h).padStart(2, '0')}:00` }))}
-            />
-          </div>
-        )}
+        {settings.notifications.enabled && <ReminderTimeRow />}
       </div>
       <div className={styles.group}>
         <div className={styles.groupTitle}>App</div>
@@ -81,6 +90,53 @@ export function SettingsScreen() {
         <ArchivedDecks />
       </div>
     </section>
+  );
+}
+
+function ReminderTimeRow() {
+  const settings = useStore((s) => s.settings.notifications);
+  const set = store.getState().updateSettings;
+
+  const { h12, min, am } = minutesToParts(settings.reminderMinutes);
+
+  function update(h12Val: number, minVal: number, amVal: boolean) {
+    const m = partsToMinutes(h12Val, minVal, amVal);
+    set({ notifications: { ...settings, reminderMinutes: m } });
+  }
+
+  const hourOptions = Array.from({ length: 12 }, (_, i) => ({ value: String(i + 1), label: String(i + 1) }));
+  const minOptions = Array.from({ length: 12 }, (_, i) => {
+    const v = i * 5;
+    return { value: String(v), label: String(v).padStart(2, '0') };
+  });
+
+  return (
+    <div className={styles.row}>
+      <span className={styles.rowLabel}>Reminder time</span>
+      <div className={styles.timeFields}>
+        <Select
+          id="reminderHour"
+          label="Hour"
+          value={String(h12)}
+          onChange={(v) => update(Number(v), min, am)}
+          options={hourOptions}
+        />
+        <Select
+          id="reminderMinute"
+          label="Minute"
+          value={String(min)}
+          onChange={(v) => update(h12, Number(v), am)}
+          options={minOptions}
+        />
+        <Select
+          id="reminderAmPm"
+          label="AM/PM"
+          value={am ? 'AM' : 'PM'}
+          onChange={(v) => update(h12, min, v === 'AM')}
+          options={[{ value: 'AM', label: 'AM' }, { value: 'PM', label: 'PM' }]}
+        />
+      </div>
+    </div>
   );
 }
 

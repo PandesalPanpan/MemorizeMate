@@ -81,7 +81,7 @@ export interface StudySession {
 
 export interface NotificationSettings {
   enabled: boolean;
-  reminderHour: number; // 0-23
+  reminderMinutes: number; // minutes since midnight (0-1439), e.g. 540 = 9:00 AM
 }
 
 export interface Settings {
@@ -101,5 +101,5 @@ export const DEFAULT_SETTINGS: Settings = {
   sidebarCollapsed: false,
   showTimer: false,
   onboardingComplete: false,
-  notifications: { enabled: false, reminderHour: 9 },
+  notifications: { enabled: false, reminderMinutes: 540 },
 };

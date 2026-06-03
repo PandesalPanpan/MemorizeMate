@@ -250,7 +250,7 @@ export function StudyScreen() {
           </div>
         ) : null;
       })()}
-      <CardFlip question={q} answer={a} onGrade={onGrade} />
+      <CardFlip question={q} answer={a} onGrade={onGrade} type={card.type} />
       <div className={styles.endBtn}>
         <Button variant="ghost" size="sm" onClick={endSessionNow}>End session</Button>
       </div>

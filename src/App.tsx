@@ -52,7 +52,7 @@ export function App() {
       setBadge(due);
       const s = store.getState().settings;
       if (s.notifications.enabled && due > 0) {
-        scheduleReminder(s.notifications.reminderHour, `You have ${due} cards due.`);
+        scheduleReminder(s.notifications.reminderMinutes, `You have ${due} cards due.`);
       }
     })().catch(console.error);
   }, []);

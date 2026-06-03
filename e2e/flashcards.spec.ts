@@ -27,6 +27,37 @@ test('create deck, add a card, study it', async ({ page }) => {
   await expect(page.getByText(/all done/i)).toBeVisible();
 });
 
+test('cloze card reveals answer inline without duplicate sentence', async ({ page }) => {
+  await page.goto('/decks');
+  await page.getByRole('button', { name: /new deck/i }).click();
+  await page.getByLabel(/deck name/i).fill('E2E Cloze');
+  await page.getByRole('button', { name: /create/i }).click();
+  await page.getByRole('link', { name: /e2e cloze/i }).click();
+
+  await page.getByRole('link', { name: /add card/i }).click();
+
+  await page.getByRole('button', { name: 'Cloze' }).click();
+
+  const textarea = page.getByRole('textbox');
+  await textarea.fill('The {{c1::mitochondria}} is the powerhouse of the cell.');
+
+  await page.getByRole('button', { name: /save card/i }).click();
+
+  await page.getByRole('link', { name: /study/i }).click();
+
+  await expect(page.getByText(/\[\.\.\.\]/)).toBeVisible();
+  await expect(page.getByText(/is the powerhouse of the cell/)).toBeVisible();
+
+  await page.getByRole('button', { name: /show answer/i }).click();
+
+  await expect(page.getByText(/mitochondria/)).toBeVisible();
+  await expect(page.getByText(/is the powerhouse of the cell/)).toBeVisible();
+  await expect(page.getByText(/\[\.\.\.\]/)).not.toBeVisible();
+
+  await page.getByRole('button', { name: /easy/i }).click();
+  await expect(page.getByText(/all done/i)).toBeVisible();
+});
+
 test('back links navigate correctly across the app', async ({ page }) => {
   // Create a deck first
   await page.goto('/decks');
@@ -160,6 +191,28 @@ test('AI generate page shows correct placeholder and aligned fields', async ({ p
 test('lives indicator is visible with heart icon', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByLabel(/lives/i)).toBeVisible();
+});
+
+test('reminder time shows AM/PM selectors and persists changes', async ({ page }) => {
+  await page.goto('/settings');
+
+  const reminderToggle = page.getByRole('checkbox', { name: /daily review reminder/i });
+  await reminderToggle.click();
+  await page.waitForTimeout(500);
+
+  await expect(page.getByLabel('Hour')).toBeVisible();
+  await expect(page.getByLabel('Minute')).toBeVisible();
+  await expect(page.getByLabel('AM/PM')).toBeVisible();
+
+  await page.getByLabel('Hour').selectOption('3');
+  await page.getByLabel('Minute').selectOption('45');
+  await page.getByLabel('AM/PM').selectOption('PM');
+
+  await page.reload();
+
+  await expect(page.getByLabel('Hour')).toHaveValue('3');
+  await expect(page.getByLabel('Minute')).toHaveValue('45');
+  await expect(page.getByLabel('AM/PM')).toHaveValue('PM');
 });
 
 test('collapsed sidebar shows icons at proper size and can toggle', async ({ page }) => {

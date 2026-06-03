@@ -13,6 +13,13 @@ async function seed() {
   return deck.id;
 }
 
+async function seedCloze() {
+  store.setState({ repo: new IndexedDbRepository('study-cloze-' + Math.random()), decks: [] });
+  const deck = await store.getState().createDeck({ name: 'ClozeDeck', description: '', color: 'ocean' });
+  await store.getState().addCard({ deckId: deck.id, type: 'cloze', front: 'The {{c1::mitochondria}} is the powerhouse.', back: '', tags: [] });
+  return deck.id;
+}
+
 describe('StudyScreen', () => {
   let deckId = '';
   beforeEach(async () => { deckId = await seed(); });
@@ -26,6 +33,27 @@ describe('StudyScreen', () => {
     expect(await screen.findByText('Q')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: /show answer/i }));
     expect(screen.getByText('A')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /easy/i }));
+    expect(await screen.findByText(/all done/i)).toBeInTheDocument();
+  });
+
+  it('reveals cloze answer inline without duplicating the sentence', async () => {
+    const clozeDeckId = await seedCloze();
+    render(
+      <MemoryRouter initialEntries={[`/decks/${clozeDeckId}/study`]}>
+        <Routes><Route path="/decks/:deckId/study" element={<StudyScreen />} /></Routes>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText(/\[\.\.\.\]/)).toBeInTheDocument();
+    expect(screen.getByText(/is the powerhouse\./)).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: /show answer/i }));
+
+    expect(screen.getByText(/mitochondria/)).toBeInTheDocument();
+    expect(screen.getByText(/is the powerhouse\./)).toBeInTheDocument();
+    expect(screen.queryByText(/\[\.\.\.\]/)).not.toBeInTheDocument();
+
     await userEvent.click(screen.getByRole('button', { name: /easy/i }));
     expect(await screen.findByText(/all done/i)).toBeInTheDocument();
   });
