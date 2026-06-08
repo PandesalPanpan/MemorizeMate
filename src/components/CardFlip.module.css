@@ -9,7 +9,23 @@
   box-shadow: var(--shadow-card);
   padding: var(--space-xl);
 }
-.prompt { font-size: var(--step-2); font-family: var(--font-display); line-height: 1.25; }
+.prompt { font-size: var(--step-2); font-family: var(--font-display); line-height: 1.5; }
+/* Inline cloze blank: stays in the flow so revealing the answer doesn't reflow
+   the surrounding sentence. */
+.blank {
+  display: inline;
+  border-radius: var(--radius-sm);
+  padding: 0 4px;
+  background: var(--color-line);
+  color: var(--color-muted);
+  font-style: italic;
+}
+.blankFilled {
+  background: var(--color-accent, var(--color-accent-deep));
+  color: #fff;
+  font-style: normal;
+  font-weight: 700;
+}
 .answer { font-size: var(--step-1); color: var(--color-accent-deep); padding-top: var(--space-md); border-top: 1px solid var(--color-line); }
 .grades { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-sm); }
 .grade {

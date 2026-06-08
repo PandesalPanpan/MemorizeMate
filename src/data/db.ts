@@ -1,6 +1,8 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
 import type { Deck, Card, ReviewLog, Settings, ExamAttempt, LivesState, StudySession } from '../types/models';
 import { DECK_COLORS } from '../types/models';
+import { clozeIndices, splitClozeNote } from '../cloze/parser';
+import { newCard } from '../fsrs/scheduler';
 
 export interface MMDB extends DBSchema {
   decks: { key: string; value: Deck };
@@ -12,7 +14,7 @@ export interface MMDB extends DBSchema {
 }
 
 export function openMMDB(name = 'memorizemate'): Promise<IDBPDatabase<MMDB>> {
-  return openDB<MMDB>(name, 4, {
+  return openDB<MMDB>(name, 5, {
     async upgrade(db, oldVersion, _newVersion, tx) {
       if (oldVersion < 1) {
         db.createObjectStore('decks', { keyPath: 'id' });
@@ -29,7 +31,7 @@ export function openMMDB(name = 'memorizemate'): Promise<IDBPDatabase<MMDB>> {
         let cursor = await deckStore.openCursor();
         while (cursor) {
           const d = cursor.value as Deck;
-          if (!(DECK_COLORS as readonly string[]).includes(d.color)) {
+          if (!(new Set(DECK_COLORS)).has(d.color)) {
             await cursor.update({ ...d, color: 'terracotta' });
           }
           cursor = await cursor.continue();
@@ -42,6 +44,36 @@ export function openMMDB(name = 'memorizemate'): Promise<IDBPDatabase<MMDB>> {
       if (oldVersion < 4) {
         const logStore = tx.objectStore('reviewLogs');
         logStore.createIndex('byCard', 'cardId');
+      }
+      if (oldVersion < 5) {
+        // Split existing multi-deletion cloze cards into one card per deletion.
+        // The original card keeps its id/SRS state and becomes the first deletion;
+        // remaining deletions become fresh cards.
+        const cardStore = tx.objectStore('cards');
+        const extras: Card[] = [];
+        let cursor = await cardStore.openCursor();
+        while (cursor) {
+          const c = cursor.value as Card;
+          if (c.type === 'cloze' && clozeIndices(c.front).length > 1) {
+            const parts = splitClozeNote(c.front);
+            await cursor.update({ ...c, front: parts[0] });
+            for (let i = 1; i < parts.length; i++) {
+              extras.push({
+                id: crypto.randomUUID(),
+                deckId: c.deckId,
+                type: 'cloze',
+                front: parts[i],
+                back: '',
+                srs: newCard(new Date()),
+                lapses: 0,
+                leech: false,
+                createdAt: c.createdAt,
+              });
+            }
+          }
+          cursor = await cursor.continue();
+        }
+        for (const e of extras) await cardStore.put(e);
       }
     },
   });

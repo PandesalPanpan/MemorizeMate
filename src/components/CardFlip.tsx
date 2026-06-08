@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { RATINGS, type Rating, type CardType } from '../types/models';
 import { playCue } from '../services/sound';
 import { useStore } from '../store/useStore';
@@ -12,11 +12,14 @@ const META: Record<Rating, { label: string; key: string; cls: string }> = {
   easy: { label: 'Easy', key: '4', cls: styles.easy },
 };
 
-export function CardFlip({ question, answer, onGrade, type }: {
+export function CardFlip({ question, answer, onGrade, type, clozePre, clozePost, clozeHint }: {
   question: string;
   answer: string;
   onGrade: (r: Rating) => void;
   type?: CardType;
+  clozePre?: string;
+  clozePost?: string;
+  clozeHint?: string;
 }) {
   const [revealed, setRevealed] = useState(false);
   const soundEnabled = useStore((s) => s.settings.soundEnabled);
@@ -49,50 +52,50 @@ export function CardFlip({ question, answer, onGrade, type }: {
   const showInline = type === 'cloze';
 
   return (
-    <div className={styles.wrap} role="region" aria-label="Flashcard">
-      <motion.div
+    <div className={styles.wrap} aria-label="Flashcard">
+      <m.div
         key={question}
         className={styles.card}
-        initial={{ opacity: 0, y: 16, rotateX: -4 }}
-        animate={{ opacity: 1, y: 0, rotateX: 0 }}
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
       >
         {showInline ? (
-          <motion.p
-            className={styles.prompt}
-            aria-live="polite"
-            key={revealed ? 'a' : 'q'}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.2 }}
-          >
-            {revealed ? answer : question}
-          </motion.p>
+          <p className={styles.prompt} aria-live="polite">
+            {clozePre}
+            <span
+              className={`${styles.blank} ${revealed ? styles.blankFilled : ''}`}
+              aria-label={revealed ? answer : 'blank'}
+            >
+              {revealed ? answer : clozeHint ? `[${clozeHint}]` : '[...]'}
+            </span>
+            {clozePost}
+          </p>
         ) : (
           <>
             <p className={styles.prompt} aria-live="polite">{question}</p>
             {revealed && (
-              <motion.p
+              <m.p
                 className={styles.answer}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.24 }}
               >
                 {answer}
-              </motion.p>
+              </m.p>
             )}
           </>
         )}
-      </motion.div>
+      </m.div>
 
       {!revealed ? (
-        <button className={`${styles.grade} ${styles.good}`} style={{ padding: 16 }} onClick={() => { setRevealed(true); playCue('flip', { soundEnabled }); }}>
+        <button type="button" className={`${styles.grade} ${styles.good}`} style={{ padding: 16 }} onClick={() => { setRevealed(true); playCue('flip', { soundEnabled }); }}>
           Show answer <span className={styles.key}>space</span>
         </button>
       ) : (
         <div className={styles.grades}>
           {RATINGS.map((r, i) => (
-            <button key={r} ref={i === 0 ? firstRatingRef : undefined} className={`${styles.grade} ${META[r].cls}`} onClick={() => submit(r)} aria-label={`Rate as ${META[r].label} (key ${META[r].key})`}>
+            <button type="button" key={r} ref={i === 0 ? firstRatingRef : undefined} className={`${styles.grade} ${META[r].cls}`} onClick={() => submit(r)} aria-label={`Rate as ${META[r].label} (key ${META[r].key})`}>
               {META[r].label}
               <span className={styles.key}>{META[r].key}</span>
             </button>

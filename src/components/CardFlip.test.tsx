@@ -28,33 +28,54 @@ describe('CardFlip', () => {
     expect(screen.getByText('A')).toBeInTheDocument();
   });
 
-  it('cloze card shows question with placeholder then reveals answer inline', async () => {
+  it('cloze card shows an in-place blank then fills it with the answer', async () => {
     const onGrade = () => {};
-    render(<CardFlip question="The [...] orbits the galaxy." answer="The sun orbits the galaxy." onGrade={onGrade} type="cloze" />);
+    render(
+      <CardFlip
+        question="The … orbits the galaxy."
+        answer="sun"
+        clozePre="The "
+        clozePost=" orbits the galaxy."
+        clozeHint="star"
+        onGrade={onGrade}
+        type="cloze"
+      />,
+    );
 
-    expect(screen.getByText('The [...] orbits the galaxy.')).toBeInTheDocument();
-    expect(screen.queryByText('The sun orbits the galaxy.')).not.toBeInTheDocument();
+    // Blank shows the hint, answer is hidden, surrounding text stays put
+    expect(screen.getByText('[star]')).toBeInTheDocument();
+    expect(screen.getByText(/orbits the galaxy\./)).toBeInTheDocument();
+    expect(screen.queryByText('sun')).not.toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: /show answer/i }));
 
-    // After reveal, the prompt should show the full answer text inline
-    expect(screen.getByText('The sun orbits the galaxy.')).toBeInTheDocument();
-    // The placeholder text should be gone
-    expect(screen.queryByText('The [...] orbits the galaxy.')).not.toBeInTheDocument();
-    // No separate answer paragraph — no duplication
-    expect(screen.queryByText('The sun orbits the galaxy.')).toBeInTheDocument();
+    // The blank is filled in place with the answer; hint placeholder gone
+    expect(screen.getByText('sun')).toBeInTheDocument();
+    expect(screen.queryByText('[star]')).not.toBeInTheDocument();
+    expect(screen.getByText(/orbits the galaxy\./)).toBeInTheDocument();
   });
 
   it('cloze card reveals on Space key', async () => {
     const onGrade = () => {};
-    render(<CardFlip question="Capital is [city]" answer="Capital is Paris" onGrade={onGrade} type="cloze" />);
+    render(
+      <CardFlip
+        question="Capital is …"
+        answer="Paris"
+        clozePre="Capital is "
+        clozePost=""
+        clozeHint="city"
+        onGrade={onGrade}
+        type="cloze"
+      />,
+    );
 
-    expect(screen.getByText('Capital is [city]')).toBeInTheDocument();
+    expect(screen.getByText('[city]')).toBeInTheDocument();
+    expect(screen.queryByText('Paris')).not.toBeInTheDocument();
 
     await userEvent.keyboard(' ');
 
-    expect(screen.getByText('Capital is Paris')).toBeInTheDocument();
-    expect(screen.queryByText('Capital is [city]')).not.toBeInTheDocument();
+    expect(screen.getByText('Paris')).toBeInTheDocument();
+    expect(screen.queryByText('[city]')).not.toBeInTheDocument();
   });
 
   it('cloze card allows rating after reveal', async () => {
@@ -70,28 +91,46 @@ describe('CardFlip', () => {
     expect(rated).toBe('good');
   });
 
+  it('reveals basic card on Enter key', async () => {
+    const onGrade = () => {};
+    render(<CardFlip question="Q" answer="A" onGrade={onGrade} />);
+    expect(screen.queryByText('A')).not.toBeInTheDocument();
+    await userEvent.keyboard('{Enter}');
+    expect(screen.getByText('A')).toBeInTheDocument();
+  });
+
+  it('reveals basic card on Space key and rates with number keys', async () => {
+    let rated = '';
+    function onGrade(r: string) { rated = r; }
+    render(<CardFlip question="Q" answer="A" onGrade={onGrade} />);
+    await userEvent.keyboard(' ');
+    expect(screen.getByText('A')).toBeInTheDocument();
+    await userEvent.keyboard('1');
+    expect(rated).toBe('again');
+  });
+
   it('cloze card resets to question after rating and new card appears', async () => {
     let gradeCount = 0;
     function onGrade() { gradeCount++; }
 
     const { rerender } = render(
-      <CardFlip key="c1" question="The [...] orbits." answer="The sun orbits." onGrade={onGrade} type="cloze" />,
+      <CardFlip key="c1" question="The … orbits." answer="sun" clozePre="The " clozePost=" orbits." onGrade={onGrade} type="cloze" />,
     );
 
     await userEvent.click(screen.getByRole('button', { name: /show answer/i }));
-    expect(screen.getByText('The sun orbits.')).toBeInTheDocument();
+    expect(screen.getByText('sun')).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: /good/i }));
     expect(gradeCount).toBe(1);
 
     // Rerender with a new card — the component remounts because key changed
     rerender(
-      <CardFlip key="c2" question="Capital is [...]" answer="Capital is Paris" onGrade={onGrade} type="cloze" />,
+      <CardFlip key="c2" question="Capital is …" answer="Paris" clozePre="Capital is " clozePost="" onGrade={onGrade} type="cloze" />,
     );
 
-    // Should show the new question, not revealed
-    expect(screen.getByText('Capital is [...]')).toBeInTheDocument();
-    expect(screen.queryByText('Capital is Paris')).not.toBeInTheDocument();
-    expect(screen.queryByText('The sun orbits.')).not.toBeInTheDocument();
+    // Should show the new card's blank, not revealed
+    expect(screen.getByText('[...]')).toBeInTheDocument();
+    expect(screen.queryByText('Paris')).not.toBeInTheDocument();
+    expect(screen.queryByText('sun')).not.toBeInTheDocument();
   });
 });
