@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -31,5 +32,16 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     exclude: ['e2e/**', 'node_modules/**'],
+    // Test-only: the PWA virtual module is provided by VitePWA at build time;
+    // alias it to a mock here so it resolves under Vitest without affecting prod.
+    alias: {
+      'virtual:pwa-register/react': fileURLToPath(new URL('./src/test/__mocks__/pwa-mock.ts', import.meta.url)),
+    },
+    coverage: {
+      provider: 'istanbul',
+      reporter: ['text', 'html'],
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: ['src/test/**', 'src/vite-env.d.ts', 'src/main.tsx'],
+    },
   },
 });

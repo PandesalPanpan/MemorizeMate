@@ -1,6 +1,6 @@
 import { useEffect, lazy, Suspense } from 'react';
 import { MemoryRouter, BrowserRouter, Routes, Route } from 'react-router-dom';
-import { MotionConfig } from 'framer-motion';
+import { MotionConfig, LazyMotion, domAnimation } from 'framer-motion';
 import { ThemeProvider } from './theme/ThemeProvider';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Layout } from './components/Layout';
@@ -62,6 +62,7 @@ export function App() {
         <ErrorToast />
         <UpdateToast />
         <MotionConfig reducedMotion={reduceMotion ? 'always' : 'user'}>
+          <LazyMotion features={domAnimation} strict>
           <Router>
             <Suspense fallback={<LoadingSpinner />}>
             <Routes>
@@ -89,6 +90,7 @@ export function App() {
             </Routes>
             </Suspense>
           </Router>
+          </LazyMotion>
         </MotionConfig>
       </ThemeProvider>
     </ErrorBoundary>

@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useEffect, type ReactNode } from 'react';
 import { useMediaQuery } from '../lib/useMediaQuery';
 import { Sidebar } from './nav/Sidebar';
@@ -36,14 +36,14 @@ export function Layout({ fab }: { fab?: ReactNode }) {
           <LivesIndicator current={lives.current} lives={lives} />
         </header>
       )}
-      <motion.main
+      <m.main
         className={styles.main}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
       >
         <Outlet />
-      </motion.main>
+      </m.main>
       {fab}
       <InstallBanner />
       {!isDesktop && <BottomNav />}
