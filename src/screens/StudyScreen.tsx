@@ -5,7 +5,7 @@ import { BackLink } from '../components/BackLink';
 import { SessionTimer } from '../components/SessionTimer';
 import { Button } from '../components/ui/Button';
 import { store, useStore } from '../store/useStore';
-import { renderCloze, clozeIndices } from '../cloze/parser';
+import { clozeSegments } from '../cloze/parser';
 import { isLocked } from '../lives/livesMachine';
 import { LockoutScreen } from './LockoutScreen';
 import {
@@ -16,14 +16,15 @@ import {
   earliestAvailableAt,
   type SessionEntry,
 } from '../session/sessionQueue';
+import { saveSnapshot, loadSnapshot, clearSnapshot, makeSessionKey } from '../session/sessionPersist';
 import type { Card, Rating } from '../types/models';
 import styles from './StudyScreen.module.css';
 
-function front(card: Card): { q: string; a: string } {
+function front(card: Card): { q: string; a: string; pre?: string; post?: string; hint?: string } {
   if (card.type === 'cloze') {
-    const idx = clozeIndices(card.front)[0] ?? 1;
-    const r = renderCloze(card.front, idx);
-    return { q: r.question, a: r.answer };
+    const seg = clozeSegments(card.front);
+    if (seg) return { q: seg.pre + ' … ' + seg.post, a: seg.answer, pre: seg.pre, post: seg.post, hint: seg.hint };
+    return { q: card.front, a: card.front };
   }
   return { q: card.front, a: card.back };
 }
@@ -55,11 +56,18 @@ export function StudyScreen() {
     const deckIdsParam = searchParams.get('deckIds');
     const ids = deckIdsParam ? deckIdsParam.split(',') : deckId ? [deckId] : [];
     deckIdsRef.current = ids;
+    const sessionKey = makeSessionKey(ids);
 
     (async () => {
-      const cards = ids.length === 1
-        ? await store.getState().dueCards(ids[0], new Date())
-        : await store.getState().dueCardsMulti(ids, new Date());
+      const snap = loadSnapshot();
+      const restoring = !!snap && snap.key === sessionKey;
+
+      const cards = restoring
+        ? (await Promise.all(snap!.cardIds.map((cid) => store.getState().repo.getCard(cid))))
+            .filter((c): c is Card => !!c)
+        : ids.length === 1
+          ? await store.getState().dueCards(ids[0], new Date())
+          : await store.getState().dueCardsMulti(ids, new Date());
       const map = new Map(cards.map((c) => [c.id, c]));
       setCardMap(map);
       // Load deck info for multi-deck color indicators
@@ -104,12 +112,43 @@ export function StudyScreen() {
       setLimitDismissed(false);
 
       const now = Date.now();
-      const sessionEntries = cards.map((c) => createSessionEntry(c.id, now));
-      setEntries(sessionEntries);
-      setCurrent(nextAvailableEntry(sessionEntries, now));
-      startedAtRef.current = now;
+      if (restoring) {
+        ratingsRef.current = { ...snap!.ratings };
+        reviewedRef.current = snap!.reviewed;
+        graduatedRef.current = snap!.graduated;
+        startedAtRef.current = snap!.startedAt;
+        setEntries(snap!.entries);
+        setCurrent(nextAvailableEntry(snap!.entries, now));
+      } else {
+        const sessionEntries = cards.map((c) => createSessionEntry(c.id, now));
+        ratingsRef.current = { again: 0, hard: 0, good: 0, easy: 0 };
+        reviewedRef.current = 0;
+        graduatedRef.current = 0;
+        startedAtRef.current = now;
+        setEntries(sessionEntries);
+        setCurrent(nextAvailableEntry(sessionEntries, now));
+        saveSnapshot({
+          key: sessionKey, deckIds: ids, entries: sessionEntries,
+          cardIds: cards.map((c) => c.id), startedAt: now,
+          ratings: { ...ratingsRef.current }, reviewed: 0, graduated: 0, savedAt: now,
+        });
+      }
     })();
   }, [deckId, searchParams, locked]);
+
+  const persistSnapshot = useCallback((nextEntries: SessionEntry[]) => {
+    saveSnapshot({
+      key: makeSessionKey(deckIdsRef.current),
+      deckIds: deckIdsRef.current,
+      entries: nextEntries,
+      cardIds: nextEntries.map((e) => e.cardId),
+      startedAt: startedAtRef.current,
+      ratings: { ...ratingsRef.current },
+      reviewed: reviewedRef.current,
+      graduated: graduatedRef.current,
+      savedAt: Date.now(),
+    });
+  }, []);
 
   useEffect(() => {
     if (!cardMap || entries.length === 0) return;
@@ -134,6 +173,7 @@ export function StudyScreen() {
   const endSessionNow = useCallback(async () => {
     if (sessionEndingRef.current) return;
     sessionEndingRef.current = true;
+    clearSnapshot();
     await store.getState().endSession();
     await store.getState().saveSession({
       id: crypto.randomUUID(),
@@ -195,7 +235,7 @@ export function StudyScreen() {
   const card = cardMap.get(current.cardId);
   if (!card) return <p>Card not found</p>;
 
-  const { q, a } = front(card);
+  const { q, a, pre, post, hint } = front(card);
   const remaining = entries.filter((e) => !e.graduated).length;
   const showNewWarning = newCardsLimit > 0 && newCardsToday >= newCardsLimit && !limitDismissed;
   const showReviewWarning = reviewsLimit > 0 && reviewsToday >= reviewsLimit && !limitDismissed;
@@ -221,6 +261,7 @@ export function StudyScreen() {
       await endSessionNow();
       return;
     }
+    persistSnapshot(next);
     setEntries(next);
     setCurrent(nextAvailableEntry(next, Date.now()));
   }
@@ -250,7 +291,7 @@ export function StudyScreen() {
           </div>
         ) : null;
       })()}
-      <CardFlip question={q} answer={a} onGrade={onGrade} type={card.type} />
+      <CardFlip question={q} answer={a} onGrade={onGrade} type={card.type} clozePre={pre} clozePost={post} clozeHint={hint} />
       <div className={styles.endBtn}>
         <Button variant="ghost" size="sm" onClick={endSessionNow}>End session</Button>
       </div>

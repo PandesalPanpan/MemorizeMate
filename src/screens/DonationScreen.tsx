@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { store } from '../store/useStore';
 import { Button } from '../components/ui/Button';
 import { Field } from '../components/ui/Field';
@@ -9,6 +9,8 @@ const GCASH = '0976 429 5810';
 
 export function DonationScreen() {
   const nav = useNavigate();
+  const [searchParams] = useSearchParams();
+  const returnTo = searchParams.get('return');
   const [amount, setAmount] = useState('');
   const [error, setError] = useState('');
 
@@ -27,7 +29,7 @@ export function DonationScreen() {
     }
 
     await store.getState().manualUnlock();
-    nav('/');
+    nav(returnTo || '/');
   }
 
   return (
