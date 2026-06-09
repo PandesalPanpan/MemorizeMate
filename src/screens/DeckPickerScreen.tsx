@@ -44,7 +44,7 @@ export function DeckPickerScreen() {
       <h2>Choose decks to study</h2>
       <p className={styles.sub}>Select which decks to include in this session.</p>
       <ul className={styles.list}>
-        {decks.map((d) => (
+        {decks.filter((d) => !d.isFolder).map((d) => (
           <li key={d.id} className={styles.row}>
             <label className={styles.label}>
               <input

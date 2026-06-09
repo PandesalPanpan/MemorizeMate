@@ -1,6 +1,7 @@
 .controls { display: flex; gap: var(--space-md); align-items: flex-end; margin-bottom: var(--space-md); flex-wrap: wrap; }
 .controls > :first-child { flex: 1; min-width: 200px; }
-.toolbar { display: flex; gap: 6px; margin-bottom: var(--space-md); flex-wrap: wrap; }
+.toolbar { display: flex; gap: 6px; margin-bottom: var(--space-md); flex-wrap: wrap; align-items: flex-end; }
+.sort { margin-left: auto; }
 .pill {
   padding: 8px 14px;
   border: 1px solid var(--color-line);

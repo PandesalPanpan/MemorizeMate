@@ -62,7 +62,7 @@ describe('DeckDetailScreen', () => {
     expect(await screen.findByText('Mitochondria')).toBeInTheDocument();
     expect(screen.getByText('Bacteria')).toBeInTheDocument();
 
-    const searchInput = screen.getByPlaceholderText('Search cards…');
+    const searchInput = screen.getByPlaceholderText('Search…');
     await userEvent.type(searchInput, 'mito');
 
     expect(screen.getByText('Mitochondria')).toBeInTheDocument();

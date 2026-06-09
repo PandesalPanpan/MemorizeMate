@@ -46,7 +46,32 @@ export interface Deck {
   reviewsPerDay?: number;
   createdAt: number;   // epoch ms
   archived?: boolean;
+  parentId?: string;   // id of containing folder (top-level when undefined)
+  isFolder?: boolean;  // folders hold sub-decks, never cards
 }
+
+export const DECK_SORTS = ['created-desc', 'created-asc', 'recent', 'most-studied', 'name-asc', 'name-desc'] as const;
+export type DeckSort = (typeof DECK_SORTS)[number];
+
+export const CARD_SORTS = ['created-desc', 'created-asc', 'due', 'recent', 'lapses'] as const;
+export type CardSort = (typeof CARD_SORTS)[number];
+
+export const DECK_SORT_LABELS: Record<DeckSort, string> = {
+  'created-desc': 'Newest first',
+  'created-asc': 'Oldest first',
+  'recent': 'Recently studied',
+  'most-studied': 'Most studied',
+  'name-asc': 'Name A–Z',
+  'name-desc': 'Name Z–A',
+};
+
+export const CARD_SORT_LABELS: Record<CardSort, string> = {
+  'created-desc': 'Newest first',
+  'created-asc': 'Oldest first',
+  'due': 'Due date',
+  'recent': 'Recently reviewed',
+  'lapses': 'Most lapsed',
+};
 
 export interface Card {
   id: string;
@@ -92,6 +117,11 @@ export interface Settings {
   showTimer?: boolean;
   onboardingComplete?: boolean;
   notifications: NotificationSettings;
+  fsrsParams?: number[];
+  fsrsParamsAccuracy?: number;
+  fsrsParamsDefaultAccuracy?: number;
+  deckSort?: DeckSort;
+  cardSort?: CardSort;
 }
 
 export const DEFAULT_SETTINGS: Settings = {

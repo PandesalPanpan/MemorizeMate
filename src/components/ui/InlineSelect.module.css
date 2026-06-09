@@ -1,0 +1,12 @@
+.wrap { position: relative; display: inline-flex; }
+.select {
+  appearance: none; -webkit-appearance: none;
+  padding: 11px 34px 11px 14px;
+  font-size: var(--step-0); font-weight: 600; line-height: 1;
+  background: transparent; color: var(--color-text);
+  border: 1px solid var(--color-line); border-radius: var(--radius-md);
+  cursor: pointer;
+}
+.select:hover { background: var(--color-sunken); }
+.select:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-wash); }
+.chev { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--color-muted); }

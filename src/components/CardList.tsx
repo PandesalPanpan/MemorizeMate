@@ -1,21 +1,29 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import type { Card } from '../types/models';
+import type { Card, CardSort } from '../types/models';
+import { CARD_SORTS, CARD_SORT_LABELS } from '../types/models';
 import { Field } from './ui/Field';
+import { InlineSelect } from './ui/InlineSelect';
 import { isDue } from '../fsrs/scheduler';
+import { sortCards } from '../lib/sorting';
+import { useStore, store } from '../store/useStore';
 import styles from './CardList.module.css';
 
 export function CardList({ deckId, cards, onDelete }: { deckId: string; cards: Card[]; onDelete: (id: string) => void }) {
   const [q, setQ] = useState('');
   const [filter, setFilter] = useState<'all' | 'due' | 'leeches' | 'new'>('all');
+  const sort = useStore((s) => s.settings.cardSort) ?? 'created-desc';
 
-  const filtered = cards.filter((c) => {
-    if (filter === 'leeches' && !c.leech) return false;
-    if (filter === 'new' && c.srs.reps > 0) return false;
-    if (filter === 'due' && !isDue(c.srs, new Date())) return false;
-    const hay = (c.front + ' ' + c.back).toLowerCase();
-    return hay.includes(q.toLowerCase());
-  });
+  const filtered = sortCards(
+    cards.filter((c) => {
+      if (filter === 'leeches' && !c.leech) return false;
+      if (filter === 'new' && c.srs.reps > 0) return false;
+      if (filter === 'due' && !isDue(c.srs, new Date())) return false;
+      const hay = (c.front + ' ' + c.back).toLowerCase();
+      return hay.includes(q.toLowerCase());
+    }),
+    sort,
+  );
 
   return (
     <div>
@@ -27,6 +35,7 @@ export function CardList({ deckId, cards, onDelete }: { deckId: string; cards: C
       <div className={styles.toolbar}>
         {(['all', 'due', 'leeches', 'new'] as const).map((f) => (
           <button
+            type="button"
             key={f}
             className={`${styles.pill} ${filter === f ? styles.pillActive : ''}`}
             onClick={() => setFilter(f)}
@@ -34,6 +43,15 @@ export function CardList({ deckId, cards, onDelete }: { deckId: string; cards: C
             {f === 'all' ? 'All' : f === 'due' ? 'Due' : f === 'leeches' ? 'Leeches' : 'New'}
           </button>
         ))}
+        <div className={styles.sort}>
+          <InlineSelect
+            ariaLabel="Sort cards"
+            prefix="Sort: "
+            value={sort}
+            onChange={(v) => store.getState().updateSettings({ cardSort: v as CardSort })}
+            options={CARD_SORTS.map((s) => ({ value: s, label: CARD_SORT_LABELS[s] }))}
+          />
+        </div>
       </div>
 
       {filtered.length === 0 ? (
@@ -47,7 +65,7 @@ export function CardList({ deckId, cards, onDelete }: { deckId: string; cards: C
                 <span className={styles.type}>{c.type === 'cloze' ? 'Cloze' : 'Basic'}</span>
                 {c.leech && <span className={styles.leech}>Leech</span>}
               </span>
-              <button className={styles.del} aria-label={`delete card ${c.front}`} onClick={() => onDelete(c.id)}>✕</button>
+              <button type="button" className={styles.del} aria-label={`delete card ${c.front}`} onClick={() => onDelete(c.id)}>✕</button>
             </li>
           ))}
         </ul>
