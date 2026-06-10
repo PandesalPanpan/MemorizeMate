@@ -2,4 +2,5 @@
 .seg { display: inline-flex; padding: 4px; background: var(--color-sunken); border-radius: var(--radius-pill); margin-bottom: var(--space-lg); }
 .segBtn { border: none; background: transparent; padding: 8px 18px; border-radius: var(--radius-pill); font-weight: 600; color: var(--color-text-soft); }
 .segBtn[aria-pressed='true'] { background: var(--color-surface); color: var(--color-accent-deep); box-shadow: var(--shadow-card); }
-.actions { margin-top: var(--space-lg); }
+.actions { margin-top: var(--space-lg); display: flex; gap: var(--space-sm); align-items: center; flex-wrap: wrap; }
+.added { color: var(--color-good, var(--color-accent-deep)); font-weight: 600; font-size: var(--step--1); }
