@@ -12,4 +12,13 @@ describe('buildPrompt', () => {
     const p = buildPrompt({ topic: 'Capitals', count: 5, type: 'basic' });
     expect(p).toContain('Front | Back');
   });
+  it('embeds the minimum-information formulation rules', () => {
+    const p = buildPrompt({ topic: 'Capitals', count: 5, type: 'basic' });
+    expect(p).toContain('Minimum information principle');
+    expect(p).toContain('atomic');
+  });
+  it('tells cloze generation to use exactly one deletion per line', () => {
+    const p = buildPrompt({ topic: 'Biology', count: 8, type: 'cloze' });
+    expect(p).toContain('EXACTLY ONE deletion');
+  });
 });
