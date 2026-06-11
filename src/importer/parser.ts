@@ -1,6 +1,7 @@
 import Papa from 'papaparse';
+import type { Deck, Card } from '../types/models';
 
-export type ImportFormat = 'cloze' | 'pipe' | 'csv' | 'unknown';
+export type ImportFormat = 'backup' | 'cloze' | 'pipe' | 'csv' | 'unknown';
 
 export interface ParsedCard {
   type: 'basic' | 'cloze';
@@ -11,6 +12,7 @@ export interface ParsedCard {
 export interface ImportResult {
   format: ImportFormat;
   cards: ParsedCard[];
+  backup?: { decks: Deck[]; cards: Card[] };
 }
 
 const CLOZE_RE = /\{\{c\d+::.*?\}\}/;
@@ -19,7 +21,17 @@ export function parseImport(raw: string): ImportResult {
   const text = raw.trim();
   if (!text) return { format: 'unknown', cards: [] };
 
-  const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  // 0. Full JSON backup ({ decks, cards }) — restore-with-merge path.
+  if (text.startsWith('{')) {
+    try {
+      const obj = JSON.parse(text);
+      if (obj && Array.isArray(obj.decks) && Array.isArray(obj.cards)) {
+        return { format: 'backup', cards: [], backup: { decks: obj.decks as Deck[], cards: obj.cards as Card[] } };
+      }
+    } catch { /* not JSON — fall through to text formats */ }
+  }
+
+  const lines = text.split(/\r?\n/).flatMap((l) => { const t = l.trim(); return t ? [t] : []; });
 
   // 1. Cloze: any line contains cloze markup
   if (lines.some((l) => CLOZE_RE.test(l))) {

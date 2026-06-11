@@ -35,8 +35,17 @@ export function ImportExportScreen() {
   const [raw, setRaw] = useState('');
   const [deckId, setDeckId] = useState('');
   const [dragOver, setDragOver] = useState(false);
+  const [mergeMode, setMergeMode] = useState<'skip' | 'overwrite' | 'copies'>('skip');
+  const [importMsg, setImportMsg] = useState('');
   const result = useMemo(() => parseImport(raw), [raw]);
   const target = deckId || activeDecks[0]?.id || '';
+
+  async function doBackupImport() {
+    if (!result.backup) return;
+    const { decks: nd, cards: nc } = await store.getState().importBackupMerge(result.backup.decks, result.backup.cards, mergeMode);
+    setImportMsg(`Imported ${nd} ${nd === 1 ? 'deck' : 'decks'} and ${nc} ${nc === 1 ? 'card' : 'cards'}.`);
+    setRaw('');
+  }
 
   // Export-specific-decks state
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -125,6 +134,27 @@ export function ImportExportScreen() {
         <Field label="Paste cards (CSV, Front | Back, or cloze)" htmlFor="paste">
           <textarea id="paste" className={styles.textarea} value={raw} onChange={(e) => setRaw(e.target.value)} />
         </Field>
+
+        {importMsg && <p className={styles.statusRow}><strong>{importMsg}</strong></p>}
+
+        {result.format === 'backup' && result.backup && (
+          <>
+            <div className={styles.statusRow}>
+              <strong>Backup detected: {result.backup.decks.length} decks, {result.backup.cards.length} cards</strong>
+              <span className={styles.badge}>format: backup</span>
+            </div>
+            <Field label="If a deck or card already exists" htmlFor="mergeMode">
+              <select id="mergeMode" value={mergeMode} onChange={(e) => setMergeMode(e.target.value as typeof mergeMode)}>
+                <option value="skip">Skip duplicates (keep my version)</option>
+                <option value="overwrite">Overwrite with backup</option>
+                <option value="copies">Import everything as copies</option>
+              </select>
+            </Field>
+            <div className={styles.importBtn}>
+              <Button onClick={doBackupImport}>Restore backup</Button>
+            </div>
+          </>
+        )}
 
         {result.cards.length > 0 && (
           <>
