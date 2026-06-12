@@ -15,3 +15,6 @@ if (!window.matchMedia) {
       dispatchEvent: () => false,
     }) as unknown as MediaQueryList;
 }
+// jsdom does not implement HTMLDialogElement.showModal()  
+HTMLDialogElement.prototype.showModal ??= function mockShowModal(this: HTMLDialogElement) { this.open = true; };  
+HTMLDialogElement.prototype.close ??= function mockClose(this: HTMLDialogElement) { this.open = false; }; 
