@@ -19,6 +19,13 @@ dist-ssr
 # Test artifacts
 test-results/
 playwright-report/
+coverage/
+
+# Heavy / non-app assets
+presentation/
+
+# Backup files
+*.bak
 
 # Editor directories and files
 .vscode/*
