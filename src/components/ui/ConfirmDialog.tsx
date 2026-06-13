@@ -37,8 +37,8 @@ export function ConfirmDialog({
         <h3 id={titleId}>{title}</h3>
         {message && <p className={styles.msg}>{message}</p>}
         <div className={styles.actions}>
-          <button ref={cancelRef} className={styles.cancel} onClick={onCancel}>Cancel</button>
-          <button ref={confirmRef} className={styles.confirm} onClick={onConfirm}>{confirmLabel}</button>
+          <button type="button" ref={cancelRef} className={styles.cancel} onClick={onCancel}>Cancel</button>
+          <button type="button" ref={confirmRef} className={styles.confirm} onClick={onConfirm}>{confirmLabel}</button>
         </div>
       </div>
     </div>

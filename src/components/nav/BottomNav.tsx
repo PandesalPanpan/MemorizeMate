@@ -4,7 +4,7 @@ import styles from './BottomNav.module.css';
 
 export function BottomNav() {
   return (
-    <nav role="navigation" aria-label="Main navigation" className={styles.bar}>
+    <nav className={styles.bar} aria-label="Main navigation">
       {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
         <NavLink
           key={to}

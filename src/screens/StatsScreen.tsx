@@ -47,7 +47,7 @@ export function StatsScreen() {
   const deckSessions = deckId
     ? sessions.filter((s) => s.deckIds.includes(deckId))
     : sessions;
-  const sortedSessions = [...deckSessions].sort((a, b) => b.startedAt - a.startedAt);
+  const sortedSessions = deckSessions.toSorted((a, b) => b.startedAt - a.startedAt);
 
   return (
     <section className={styles.page}>

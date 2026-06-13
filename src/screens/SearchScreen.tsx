@@ -71,7 +71,7 @@ export function SearchScreen() {
           autoFocus
         />
         {query && (
-          <button className={styles.clear} onClick={() => setQuery('')} aria-label="Clear search">
+          <button type="button" className={styles.clear} onClick={() => setQuery('')} aria-label="Clear search">
             &times;
           </button>
         )}

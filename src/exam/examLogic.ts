@@ -14,7 +14,7 @@ function missCounts(prior: ExamAttempt[]): Map<string, number> {
 /** Order cards so frequently-missed ones come first; ties keep input order. */
 export function orderExamCards(cards: Card[], prior: ExamAttempt[]): Card[] {
   const miss = missCounts(prior);
-  return [...cards].sort((a, b) => (miss.get(b.id) ?? 0) - (miss.get(a.id) ?? 0));
+  return cards.toSorted((a, b) => (miss.get(b.id) ?? 0) - (miss.get(a.id) ?? 0));
 }
 
 export function scoreAttempt(results: ExamResult[]): number {

@@ -67,9 +67,16 @@ export class IndexedDbRepository implements Repository {
     if (ns && typeof ns.reminderHour === 'number' && typeof ns.reminderMinutes !== 'number') {
       ns.reminderMinutes = (ns.reminderHour as number) * 60;
       delete ns.reminderHour;
-      await (await this.dbp).put('settings', raw as Settings, SETTINGS_KEY);
+      await (await this.dbp).put('settings', raw as unknown as Settings, SETTINGS_KEY);
     }
-    return raw as unknown as Settings;
+    return {
+      ...DEFAULT_SETTINGS,
+      ...(raw as unknown as Settings),
+      notifications: {
+        ...DEFAULT_SETTINGS.notifications,
+        ...(ns ?? {}),
+      },
+    } as Settings;
   }
   async putSettings(settings: Settings): Promise<void> {
     await (await this.dbp).put('settings', settings as Settings | LivesState, SETTINGS_KEY);

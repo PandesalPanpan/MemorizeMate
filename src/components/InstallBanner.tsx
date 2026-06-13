@@ -31,7 +31,7 @@ export function InstallBanner() {
       <span className={styles.text}>Add MemorizeMate to your home screen for quick access</span>
       <div className={styles.actions}>
         <Button size="sm" onClick={handleInstall}>Install</Button>
-        <button className={styles.dismiss} onClick={handleDismiss} aria-label="Dismiss">×</button>
+        <button type="button" className={styles.dismiss} onClick={handleDismiss} aria-label="Dismiss">×</button>
       </div>
     </div>
   );

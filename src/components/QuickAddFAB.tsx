@@ -49,13 +49,13 @@ export function QuickAddFAB() {
         <div className={styles.menu}>
           <div className={styles.menuTitle}>Add card to…</div>
           {decks.map((d) => (
-            <button key={d.id} className={styles.menuItem} onClick={() => pickDeck(d.id)}>
+            <button type="button" key={d.id} className={styles.menuItem} onClick={() => pickDeck(d.id)}>
               {d.name}
             </button>
           ))}
         </div>
       )}
-      <button className={styles.fab} aria-label="add card" onClick={handleClick}>
+      <button type="button" className={styles.fab} aria-label="add card" onClick={handleClick}>
         <Plus size={28} strokeWidth={2.4} />
       </button>
     </div>

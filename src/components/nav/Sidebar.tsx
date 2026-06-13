@@ -11,7 +11,7 @@ export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle:
         <span className={styles.mark}>✦</span>
         {!collapsed && <span className={styles.word}>MemorizeMate</span>}
       </div>
-      <nav role="navigation" aria-label="Main navigation" className={styles.nav}>
+      <nav className={styles.nav} aria-label="Main navigation">
         {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}
@@ -26,6 +26,7 @@ export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle:
         ))}
       </nav>
       <button
+        type="button"
         className={styles.toggle}
         aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         onClick={onToggle}

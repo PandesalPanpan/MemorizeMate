@@ -12,7 +12,7 @@ export function UpdateToast() {
   return (
     <div className={styles.toast} role="alert" aria-live="assertive">
       <span>A new version is available</span>
-      <button onClick={() => updateServiceWorker(true)}>Update</button>
+      <button type="button" onClick={() => updateServiceWorker(true)}>Update</button>
     </div>
   );
 }
