@@ -12,3 +12,11 @@
 .switch input:checked + .track::after { transform: translateX(19px); }
 
 .timeFields { display: flex; gap: var(--space-sm); }
+
+.rowValue { color: var(--color-text); }
+
+.accuracyCompare { display: inline-flex; align-items: center; gap: 2px; }
+.accuracyOld { color: var(--color-muted); text-decoration: line-through; }
+.accuracyNew { color: var(--color-accent); font-weight: 700; }
+
+.optimizeError { color: var(--color-error); margin: var(--space-sm) 0 0; font-size: var(--step--2); }

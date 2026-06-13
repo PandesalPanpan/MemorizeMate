@@ -35,11 +35,6 @@ function partsToMinutes(h12: number, min: number, am: boolean): number {
   return h24 * 60 + min;
 }
 
-function formatTimeLabel(minutes: number): string {
-  const { h12, min, am } = minutesToParts(minutes);
-  return `${h12}:${String(min).padStart(2, '0')} ${am ? 'AM' : 'PM'}`;
-}
-
 export function SettingsScreen() {
   const settings = useStore((s) => s.settings);
   const set = store.getState().updateSettings;
@@ -85,6 +80,7 @@ export function SettingsScreen() {
         <div className={styles.groupTitle}>App</div>
         <InstallAppRow />
       </div>
+      <FsrsOptimizationSection />
       <div className={styles.group}>
         <div className={styles.groupTitle}>Archived decks</div>
         <ArchivedDecks />
@@ -173,6 +169,85 @@ function ArchivedDecks() {
           }}>Unarchive</Button>
         </div>
       ))}
+    </div>
+  );
+}
+
+function FsrsOptimizationSection() {
+  const settings = useStore((s) => s.settings);
+  const optimizing = useStore((s) => s.fsrsOptimizing);
+  const progress = useStore((s) => s.fsrsOptimizeProgress);
+  const [localError, setLocalError] = useState<string | null>(null);
+
+  const handleOptimize = async () => {
+    setLocalError(null);
+    try {
+      await store.getState().optimizeFsrsParams();
+    } catch (e) {
+      setLocalError(e instanceof Error ? e.message : 'Optimization failed');
+    }
+  };
+
+  const handleReset = async () => {
+    await store.getState().resetFsrsParams();
+  };
+
+  return (
+    <div className={styles.group}>
+      <div className={styles.groupTitle}>FSRS Personalization</div>
+
+      <div className={styles.row}>
+        <span className={styles.rowLabel}>Parameters</span>
+        <span className={styles.rowValue}>
+          {settings.fsrsParams ? 'Personalized' : 'Default'}
+        </span>
+      </div>
+
+      {settings.fsrsParamsAccuracy != null && (
+        <div className={styles.row}>
+          <span className={styles.rowLabel}>Prediction accuracy</span>
+          <span className={styles.rowValue}>
+            {settings.fsrsParamsDefaultAccuracy != null && (
+              <span className={styles.accuracyCompare}>
+                <span className={styles.accuracyOld}>
+                  {(settings.fsrsParamsDefaultAccuracy * 100).toFixed(1)}%
+                </span>
+                {' → '}
+              </span>
+            )}
+            <span className={styles.accuracyNew}>
+              {(settings.fsrsParamsAccuracy * 100).toFixed(1)}%
+            </span>
+          </span>
+        </div>
+      )}
+
+      <div className={styles.row}>
+        <span className={styles.rowLabel}>
+          {optimizing
+            ? `Optimizing... ${Math.round(progress * 100)}%`
+            : 'Recalibrate using your review history'}
+        </span>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={optimizing}
+          onClick={handleOptimize}
+        >
+          {optimizing ? 'Running...' : 'Optimize'}
+        </Button>
+      </div>
+
+      {settings.fsrsParams && (
+        <div className={styles.row}>
+          <span className={styles.rowLabel}>Reset to default parameters</span>
+          <Button variant="ghost" size="sm" onClick={handleReset}>
+            Reset
+          </Button>
+        </div>
+      )}
+
+      {localError && <p className={styles.optimizeError}>{localError}</p>}
     </div>
   );
 }

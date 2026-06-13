@@ -16,8 +16,11 @@ const RATING_MAP: Record<Rating, Grade> = {
   easy: FsrsRating.Easy as Grade,
 };
 
-function engine(desiredRetention = 0.9) {
-  return fsrs(generatorParameters({ request_retention: desiredRetention }));
+function engine(desiredRetention = 0.9, customW?: number[]) {
+  return fsrs(generatorParameters({
+    request_retention: desiredRetention,
+    ...(customW ? { w: customW } : {}),
+  }));
 }
 
 export function newCard(now: Date = new Date()): FsrsCard {
@@ -38,8 +41,9 @@ export function grade(
   rating: Rating,
   now: Date = new Date(),
   desiredRetention = 0.9,
+  customW?: number[],
 ): GradeResult {
-  const item: RecordLogItem = engine(desiredRetention).next(card, now, RATING_MAP[rating]);
+  const item: RecordLogItem = engine(desiredRetention, customW).next(card, now, RATING_MAP[rating]);
   return {
     card: item.card,
     log: {
