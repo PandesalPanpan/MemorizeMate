@@ -87,4 +87,38 @@ describe('ImportExportScreen', () => {
     await userEvent.click(selectAll);
     expect((screen.getByRole('checkbox', { name: /^bio$/i }) as HTMLInputElement).checked).toBe(false);
   });
+
+  it('does nothing when importing with no target deck', async () => {
+    store.setState({ decks: [] });
+    render(<MemoryRouter><ImportExportScreen /></MemoryRouter>);
+    await userEvent.type(screen.getByLabelText(/paste/i), 'Dog | Perro');
+    expect(await screen.findByText(/1 cards detected/i)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /import 1 cards/i }));
+    const allCards = await store.getState().repo.listCards();
+    expect(allCards).toHaveLength(0);
+  });
+
+  it('exports everything as JSON', async () => {
+    const captured = captureBlob();
+    await store.getState().addCard({ deckId, type: 'basic', front: 'Dog', back: 'Perro', tags: [] });
+    render(<MemoryRouter><ImportExportScreen /></MemoryRouter>);
+    await userEvent.click(screen.getByRole('button', { name: /^export json$/i }));
+    await waitFor(() => {
+      expect(captured.current).not.toBeNull();
+    });
+    const payload = JSON.parse(captured.current!);
+    expect(payload.cards).toHaveLength(1);
+  });
+
+  it('exports everything as CSV', async () => {
+    const captured = captureBlob();
+    await store.getState().addCard({ deckId, type: 'basic', front: 'Dog', back: 'Perro', tags: [] });
+    render(<MemoryRouter><ImportExportScreen /></MemoryRouter>);
+    await userEvent.click(screen.getByRole('button', { name: /^export csv$/i }));
+    await waitFor(() => {
+      expect(captured.current).not.toBeNull();
+    });
+    expect(captured.current).toContain('front,back');
+    expect(captured.current).toContain('Dog,Perro');
+  });
 });

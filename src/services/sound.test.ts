@@ -26,4 +26,13 @@ describe('sound service', () => {
     playCue('correct', { soundEnabled: true });
     expect(spy).toHaveBeenCalled();
   });
+
+  it('plays sounds without AudioContext (vibrate only)', () => {
+    (globalThis as any).AudioContext = undefined;
+    (globalThis as any).webkitAudioContext = undefined;
+    const vibrateSpy = vi.fn();
+    (navigator as any).vibrate = vibrateSpy;
+    playCue('flip', { soundEnabled: true });
+    expect(vibrateSpy).toHaveBeenCalledWith(8);
+  });
 });

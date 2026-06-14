@@ -1,4 +1,12 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+
+vi.mock('virtual:pwa-register/react', () => ({
+  useRegisterSW: () => ({
+    needRefresh: [false],
+    updateServiceWorker: () => Promise.resolve(),
+  }),
+}));
+
 import { render, screen } from '@testing-library/react';
 import { App } from './App';
 import { store } from './store/useStore';

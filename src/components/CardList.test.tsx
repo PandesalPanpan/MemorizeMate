@@ -27,4 +27,17 @@ describe('CardList', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Leeches' }));
     expect(screen.queryByText('Mitochondria')).not.toBeInTheDocument();
   });
+
+  it('shows "No cards match" when filter returns empty', async () => {
+    render(<MemoryRouter><CardList deckId="d" cards={cards} onDelete={() => {}} /></MemoryRouter>);
+    await userEvent.type(screen.getByLabelText(/search/i), 'zzz_nonexistent_zzz');
+    expect(screen.getByText('No cards match.')).toBeInTheDocument();
+  });
+
+  it('calls onDelete when delete button is clicked', async () => {
+    let deleted = '';
+    render(<MemoryRouter><CardList deckId="d" cards={cards} onDelete={(id) => { deleted = id; }} /></MemoryRouter>);
+    await userEvent.click(screen.getByRole('button', { name: /delete card mitochondria/i }));
+    expect(deleted).toBe('1');
+  });
 });

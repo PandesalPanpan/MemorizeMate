@@ -20,4 +20,12 @@ describe('buildCalendar', () => {
     expect(cal.monthLabels[0]).toHaveProperty('label');
     expect(cal.monthLabels[0]).toHaveProperty('colIndex');
   });
+
+  it('pads start to Sunday when today is not Sunday', () => {
+    const today = new Date('2026-06-03T12:00:00'); // Wednesday
+    const cal = buildCalendar({}, 3, today);
+    // date range: 2026-06-01 (Mon) to 2026-06-03 (Wed)
+    // padded to Sunday 2026-05-31
+    expect(cal.weeks[0][0]?.key).toBe('2026-05-31');
+  });
 });
