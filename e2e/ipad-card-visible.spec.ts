@@ -31,9 +31,16 @@ test('next card front text is visible after rating without an extra tap', async 
   const card = page.locator('[aria-label="Flashcard"] > div').first();
   const prompt = card.locator('p').first();
 
-  // Card 1 — reveal and rate Easy so it graduates and card 2 appears.
+  // Card 1 — reveal the answer. It must be visible at full opacity WITHOUT
+  // any further interaction. Under the bug the answer <p> stalled at opacity:0
+  // (only the grade buttons showed), so the user never saw the answer.
   await expect(prompt).toContainText(/question front/);
   await page.getByRole('button', { name: /show answer/i }).click();
+  const answer = card.getByText(/answer$/i);
+  await expect(answer).toBeVisible();
+  await expect(answer).toHaveCSS('opacity', '1');
+
+  // Rate Easy so it graduates and card 2 appears.
   await page.getByRole('button', { name: /easy/i }).click();
 
   // Card 2 must be painted to full opacity and its front text shown with NO
