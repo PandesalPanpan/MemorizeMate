@@ -109,6 +109,31 @@ describe('CardFlip', () => {
     expect(rated).toBe('again');
   });
 
+  it('basic card front text stays rendered (not animation-gated) after advancing', async () => {
+    // Regression: on iPad 7 the next card's front text was invisible until a tap
+    // because framer-motion left it at opacity:0. The text must be in the DOM
+    // and visible (no inline opacity) immediately on remount.
+    let graded = 0;
+    function onGrade() { graded++; }
+
+    const { rerender } = render(
+      <CardFlip key="q1" question="First question" answer="A1" onGrade={onGrade} type="basic" />,
+    );
+    await userEvent.click(screen.getByRole('button', { name: /show answer/i }));
+    await userEvent.click(screen.getByRole('button', { name: /good/i }));
+    expect(graded).toBe(1);
+
+    rerender(
+      <CardFlip key="q2" question="Second question" answer="A2" onGrade={onGrade} type="basic" />,
+    );
+
+    const prompt = screen.getByText('Second question');
+    expect(prompt).toBeInTheDocument();
+    // The front prompt must not carry an inline opacity that could hide it.
+    expect(prompt.style.opacity).toBe('');
+    expect(screen.queryByText('A2')).not.toBeInTheDocument();
+  });
+
   it('cloze card resets to question after rating and new card appears', async () => {
     let gradeCount = 0;
     function onGrade() { gradeCount++; }

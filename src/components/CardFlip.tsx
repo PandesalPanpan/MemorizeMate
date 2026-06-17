@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { m } from 'framer-motion';
 import { RATINGS, type Rating, type CardType } from '../types/models';
 import { playCue } from '../services/sound';
 import { useStore } from '../store/useStore';
@@ -53,13 +52,11 @@ export function CardFlip({ question, answer, onGrade, type, clozePre, clozePost,
 
   return (
     <div className={styles.wrap} aria-label="Flashcard">
-      <m.div
-        key={question}
-        className={styles.card}
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
-      >
+      {/* `key={question}` restarts the CSS enter animation per card. The card's
+          default opacity is 1, so the text is ALWAYS visible even if the
+          animation frame never paints (iPad 7 / old WebKit) — the fade is
+          purely decorative, never a visibility gate. */}
+      <div key={question} className={styles.card}>
         {showInline ? (
           <p className={styles.prompt} aria-live="polite">
             {clozePre}
@@ -75,18 +72,13 @@ export function CardFlip({ question, answer, onGrade, type, clozePre, clozePost,
           <>
             <p className={styles.prompt} aria-live="polite">{question}</p>
             {revealed && (
-              <m.p
-                className={styles.answer}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.24 }}
-              >
+              <p className={`${styles.answer} ${styles.answerIn}`}>
                 {answer}
-              </m.p>
+              </p>
             )}
           </>
         )}
-      </m.div>
+      </div>
 
       {!revealed ? (
         <button type="button" className={`${styles.grade} ${styles.good}`} style={{ padding: 16 }} onClick={() => { setRevealed(true); playCue('flip', { soundEnabled }); }}>
