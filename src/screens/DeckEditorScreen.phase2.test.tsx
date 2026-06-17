@@ -81,7 +81,7 @@ describe('DeckEditorScreen — phase 2', () => {
     expect(updateSpy).toHaveBeenCalledWith(expect.objectContaining({ name: 'Renamed Deck', description: 'New desc' }));
   });
 
-  it('shows Loading when deck is null', async () => {
+  it('shows a loading placeholder when deck is null', async () => {
     vi.spyOn(store.getState().repo, 'getDeck').mockResolvedValue(undefined as any);
     render(
       <MemoryRouter initialEntries={['/decks/deck-1/edit']}>
@@ -90,7 +90,7 @@ describe('DeckEditorScreen — phase 2', () => {
         </Routes>
       </MemoryRouter>,
     );
-    expect(await screen.findByText('Loading…')).toBeInTheDocument();
+    expect(await screen.findByLabelText('Loading')).toBeInTheDocument();
   });
 
   it('sets empty string for no newCardsPerDay and reviewsPerDay', async () => {

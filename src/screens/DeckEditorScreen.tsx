@@ -5,6 +5,7 @@ import { BackLink } from '../components/BackLink';
 import { Button } from '../components/ui/Button';
 import { Field } from '../components/ui/Field';
 import { DeckColorPicker } from '../components/DeckColorPicker';
+import { PanelSkeleton } from '../components/Skeleton';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import type { Deck, DeckColor } from '../types/models';
 import styles from './DeckEditorScreen.module.css';
@@ -53,7 +54,7 @@ export function DeckEditorScreen() {
     nav(`/decks/${deck.id}`);
   }
 
-  if (!deck) return <p>Loading…</p>;
+  if (!deck) return <PanelSkeleton />;
 
   return (
     <section className={styles.page}>

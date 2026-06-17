@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { CardFlip } from '../components/CardFlip';
+import { StudyCardSkeleton } from '../components/Skeleton';
 import { BackLink } from '../components/BackLink';
 import { SessionTimer } from '../components/SessionTimer';
 import { Button } from '../components/ui/Button';
@@ -190,7 +191,7 @@ export function StudyScreen() {
 
   if (locked) return <LockoutScreen />;
 
-  if (!cardMap) return <p>Loading…</p>;
+  if (!cardMap) return <StudyCardSkeleton />;
 
   if (entries.length === 0 || allGraduated(entries)) {
     const backTo = deckId ? `/decks/${deckId}` : '/decks';
@@ -230,7 +231,7 @@ export function StudyScreen() {
     );
   }
 
-  if (!current) return <p>Loading…</p>;
+  if (!current) return <StudyCardSkeleton />;
 
   const card = cardMap.get(current.cardId);
   if (!card) return <p>Card not found</p>;

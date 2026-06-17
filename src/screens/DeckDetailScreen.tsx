@@ -7,6 +7,7 @@ import { Button } from '../components/ui/Button';
 import { Monogram } from '../components/Monogram';
 import { DeckCard } from '../components/DeckCard';
 import { CardList } from '../components/CardList';
+import { PanelSkeleton } from '../components/Skeleton';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import type { Card, Deck } from '../types/models';
 import { isDue } from '../fsrs/scheduler';
@@ -70,7 +71,7 @@ export function DeckDetailScreen() {
     nav(`/study?deckIds=${Array.from(selected).join(',')}`);
   }
 
-  if (!deck) return <p>Loading…</p>;
+  if (!deck) return <PanelSkeleton />;
 
   // ---------- Folder view ----------
   if (isFolder) {
