@@ -79,6 +79,10 @@ export function SettingsScreen() {
       <div className={styles.group}>
         <div className={styles.groupTitle}>App</div>
         <InstallAppRow />
+        <div className={styles.row}>
+          <span className={styles.rowLabel}>Version</span>
+          <span className={styles.rowValue}>{__APP_VERSION__}</span>
+        </div>
       </div>
       <FsrsOptimizationSection />
       <div className={styles.group}>

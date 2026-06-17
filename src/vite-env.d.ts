@@ -9,6 +9,10 @@ declare module 'virtual:pwa-register/react' {
   };
 }
 
+// Injected at build time via Vite `define` (image tag in Docker, package.json
+// version in local dev).
+declare const __APP_VERSION__: string;
+
 interface ImportMetaEnv {
   readonly VITE_APP_NAME: string;
   readonly VITE_PUSH_ENDPOINT: string;

@@ -2,8 +2,17 @@ import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import pkg from './package.json' with { type: 'json' };
+
+// Displayed in Settings. In Docker, APP_VERSION is set to the image tag (e.g.
+// "5.1.0") so the in-app version always matches the deployed image. Falls back
+// to the package.json version for local dev.
+const appVersion = process.env.APP_VERSION || pkg.version;
 
 export default defineConfig({
+  define: {
+    __APP_VERSION__: JSON.stringify(appVersion),
+  },
   plugins: [
     react(),
     VitePWA({
