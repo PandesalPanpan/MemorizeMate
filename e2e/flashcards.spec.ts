@@ -7,18 +7,18 @@ test('create deck, add a card, study it', async ({ page }) => {
   await page.getByRole('button', { name: /create/i }).click();
   await page.getByRole('link', { name: /e2e biology/i }).click();
 
-  // BackLink should be visible on deck detail
-  await expect(page.locator('main').getByRole('link', { name: /decks/i })).toBeVisible();
+  // BackLink should be visible on deck detail (label is "Back")
+  await expect(page.locator('main').getByRole('link', { name: /back/i })).toBeVisible();
 
   await page.getByRole('link', { name: /add card/i }).click();
   await page.getByLabel('Front').fill('Capital of France');
   await page.getByLabel('Back').fill('Paris');
-  await page.getByRole('button', { name: /save card/i }).click();
+  await page.getByRole("button", { name: "Save & done" }).click();
 
   // Back on deck detail page
   await expect(page.getByText(/capital of france/i)).toBeVisible();
 
-  await page.getByRole('link', { name: /study/i }).click();
+  await page.getByRole('link', { name: /^Study$/ }).click();
   await expect(page.getByText('Capital of France')).toBeVisible();
   await page.getByRole('button', { name: /show answer/i }).click();
   await expect(page.getByText('Paris')).toBeVisible();
@@ -44,9 +44,9 @@ test('cloze card reveals answer inline without duplicate sentence', async ({ pag
   const textarea = page.getByRole('textbox');
   await textarea.fill('The {{c1::mitochondria}} is the powerhouse of the cell.');
 
-  await page.getByRole('button', { name: /save card/i }).click();
+  await page.getByRole("button", { name: "Save & done" }).click();
 
-  await page.getByRole('link', { name: /study/i }).click();
+  await page.getByRole('link', { name: /^Study$/ }).click();
 
   await expect(page.getByText(/\[\.\.\.\]/)).toBeVisible();
   await expect(page.getByText(/is the powerhouse of the cell/)).toBeVisible();
@@ -70,9 +70,9 @@ test('back links navigate correctly across the app', async ({ page }) => {
   await page.getByLabel(/deck name/i).fill('Back Link Test');
   await page.getByRole('button', { name: /create/i }).click();
 
-  // Navigate to deck detail — BackLink should lead to /decks
+  // Navigate to deck detail — BackLink (label "Back") should lead to /decks
   await page.getByRole('link', { name: /back link test/i }).click();
-  const backToDecks = page.locator('main').getByRole('link', { name: /decks/i });
+  const backToDecks = page.locator('main').getByRole('link', { name: /^back$/i });
   await expect(backToDecks).toBeVisible();
   await backToDecks.click();
   await expect(page).toHaveURL(/\/decks/);
@@ -87,7 +87,7 @@ test('back links navigate correctly across the app', async ({ page }) => {
   await expect(page).toHaveURL(/\/decks\/.+/);
 
   // Navigate to study — BackLink should lead back to deck
-  await page.getByRole('link', { name: /study/i }).click();
+  await page.getByRole('link', { name: /^Study$/ }).click();
   // Back link text on study is "Back to deck" or "Back"
   await page.locator('main').getByRole('link', { name: /back/i }).first().click();
   await expect(page).toHaveURL(/\/decks\/.+/);
