@@ -17,18 +17,28 @@ export function celebrate(opts: { reduceMotion?: boolean } = {}): void {
     return;
   }
   try {
-    const fire = (ratio: number, extra: confetti.Options) =>
-      confetti({
-        origin: { y: 0.7 },
-        colors: ['#c75b39', '#5a7d5a', '#c79a3a', '#7a5a8a', '#4a5a8a'],
-        particleCount: Math.floor(160 * ratio),
-        ...extra,
-      });
-    fire(0.25, { spread: 26, startVelocity: 55 });
-    fire(0.2, { spread: 60 });
-    fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
-    fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
-    fire(0.1, { spread: 120, startVelocity: 45 });
+    // Keep this light: two small bursts (~70 particles total) with a fast
+    // decay so the rAF loop ends quickly. The previous 5-burst/160-each
+    // version caused noticeable lag on lower-end devices.
+    confetti({
+      origin: { y: 0.7 },
+      colors: ['#c75b39', '#5a7d5a', '#c79a3a', '#7a5a8a', '#4a5a8a'],
+      particleCount: 45,
+      spread: 60,
+      startVelocity: 45,
+      decay: 0.9,
+      ticks: 120,
+    });
+    confetti({
+      origin: { y: 0.7 },
+      colors: ['#c75b39', '#5a7d5a', '#c79a3a', '#7a5a8a', '#4a5a8a'],
+      particleCount: 25,
+      spread: 100,
+      startVelocity: 30,
+      decay: 0.9,
+      scalar: 0.85,
+      ticks: 120,
+    });
   } catch {
     /* ignore — confetti is purely decorative */
   }
