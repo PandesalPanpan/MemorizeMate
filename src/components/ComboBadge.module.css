@@ -1,0 +1,26 @@
+.combo {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-wash);
+  color: var(--color-accent-deep);
+  font-weight: 700;
+  font-size: var(--step--1);
+  animation: pop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.count { font-family: var(--font-mono); }
+.flame { font-size: 1em; }
+.mult {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  color: var(--color-accent);
+}
+
+@keyframes pop {
+  0% { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.18); }
+  100% { transform: scale(1); opacity: 1; }
+}

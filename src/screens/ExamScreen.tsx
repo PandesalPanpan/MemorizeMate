@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { store } from '../store/useStore';
+import { store, useStore } from '../store/useStore';
+import { applyGrade } from '../gamification/xp';
+import type { Rating } from '../types/models';
 import { orderExamCards, scoreAttempt } from '../exam/examLogic';
 import { renderCloze, clozeIndices } from '../cloze/parser';
 import { BackLink } from '../components/BackLink';
@@ -25,6 +27,9 @@ export function ExamScreen() {
   const [i, setI] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [results, setResults] = useState<ExamResult[]>([]);
+  const gamified = useStore((s) => s.settings.gamificationEnabled);
+  const [examXp, setExamXp] = useState(0);
+  const comboRef = useRef(0);
 
   async function start() {
     if (!deckId) return;
@@ -34,6 +39,8 @@ export function ExamScreen() {
     ]);
     setQueue(orderExamCards(cards, prior));
     setI(0); setRevealed(false); setResults([]);
+    comboRef.current = 0;
+    setExamXp(0);
     setPhase('running');
   }
 
@@ -42,6 +49,16 @@ export function ExamScreen() {
     const next = [...results, { cardId: card.id, correct, ...(confidence !== undefined && { confidence }) }];
     setResults(next);
     setRevealed(false);
+
+    if (gamified) {
+      const rating: Rating = !correct ? 'again' : confidence === 2 ? 'easy' : 'good';
+      const { combo: newCombo, xp } = applyGrade(rating, comboRef.current);
+      comboRef.current = newCombo;
+      if (xp > 0) {
+        setExamXp((x) => x + xp);
+        await store.getState().awardXp(xp, newCombo);
+      }
+    }
     if (i + 1 < queue.length) {
       setI(i + 1);
     } else {
@@ -98,6 +115,9 @@ export function ExamScreen() {
       <section className={styles.page}>
         <h2>Exam complete</h2>
         <p className={styles.score}>Your score: {score}%</p>
+        {gamified && examXp > 0 && (
+          <p className={styles.score} data-testid="exam-xp">+{examXp} XP</p>
+        )}
         <p>Want to apply how you did to your real review schedule? Cards you got right move forward; missed cards come back sooner.</p>
         <div className={styles.actions}>
           <Button onClick={applyToSchedule}>Apply to my schedule</Button>

@@ -46,6 +46,7 @@ export function App() {
   useEffect(() => {
     store.getState().load().catch(console.error);
     store.getState().loadLives().catch(console.error);
+    store.getState().loadProfile().catch(console.error);
     (async () => {
       const cards = await store.getState().repo.listCards();
       const due = cards.filter((c) => isDue(c.srs, new Date())).length;

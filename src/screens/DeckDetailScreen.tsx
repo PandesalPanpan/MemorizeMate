@@ -153,6 +153,7 @@ export function DeckDetailScreen() {
       </div>
       <div className={styles.actions}>
         <Link to={`/decks/${deck.id}/study`}><Button>Study</Button></Link>
+        <Link to={`/decks/${deck.id}/study?all=1`}><Button variant="outline">Study all</Button></Link>
         <Link to={`/decks/${deck.id}/exam`}><Button variant="outline">Exam</Button></Link>
         <Link to={`/decks/${deck.id}/stats`}><Button variant="outline">Stats</Button></Link>
         <Link to={`/decks/${deck.id}/cards/new`}><Button variant="outline">Add card</Button></Link>

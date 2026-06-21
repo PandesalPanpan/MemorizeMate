@@ -12,6 +12,18 @@
 .switch input:checked + .track::after { transform: translateX(19px); }
 
 .timeFields { display: flex; gap: var(--space-sm); }
+/* The Select component adds its own bottom margin; cancel it inside the
+   inline time row so the three fields align with the label. */
+.timeFields > * { margin-bottom: 0; }
+
+/* On narrow screens the label + three selects collapse and the chevron
+   padding clips each value to look empty. Let the row wrap and give the
+   time fields the full width, splitting it evenly. */
+@media (max-width: 560px) {
+  .row { flex-wrap: wrap; }
+  .timeFields { width: 100%; }
+  .timeFields > * { flex: 1; min-width: 0; }
+}
 
 .rowValue { color: var(--color-text); }
 

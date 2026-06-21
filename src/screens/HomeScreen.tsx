@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Heatmap } from '../components/Heatmap';
 import { StreakBadge } from '../components/StreakBadge';
+import { XpBar } from '../components/XpBar';
 import { useStore, store } from '../store/useStore';
 import { dailyCounts, currentStreak } from '../stats/heatmap';
 import { isDue } from '../fsrs/scheduler';
@@ -10,6 +11,8 @@ import styles from './HomeScreen.module.css';
 
 export function HomeScreen() {
   const decks = useStore((s) => s.decks);
+  const gamified = useStore((s) => s.settings.gamificationEnabled);
+  const totalXp = useStore((s) => s.profile.totalXp);
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [streak, setStreak] = useState(0);
   const [dueByDeck, setDueByDeck] = useState<Record<string, number>>({});
@@ -37,6 +40,12 @@ export function HomeScreen() {
         <StreakBadge streak={streak} />
       </div>
 
+      {gamified && (
+        <div className={styles.xpCard}>
+          <XpBar totalXp={totalXp} />
+        </div>
+      )}
+
       <div className={styles.due}>
         <div className={styles.dueNum}>{totalDue}</div>
         <div className={styles.dueLabel}>cards due today</div>
@@ -45,10 +54,14 @@ export function HomeScreen() {
           const studyLink = dueIds.length > 1
             ? `/study?deckIds=${dueIds.join(',')}`
             : `/decks/${dueIds[0] ?? decks[0].id}/study`;
+          const allLink = studyLink.includes('?') ? `${studyLink}&all=1` : `${studyLink}?all=1`;
           return (
-            <Link to={studyLink}>
-              <Button>Study all due</Button>
-            </Link>
+            <>
+              <Link to={studyLink}>
+                <Button>Study all due</Button>
+              </Link>
+              <Link to={allLink}><Button variant="ghost" size="sm">Study all at once</Button></Link>
+            </>
           );
         })()}
         {decks.length > 1 && (
