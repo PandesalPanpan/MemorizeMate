@@ -62,23 +62,21 @@ test('XP persists and level bar advances on Home', async ({ page }) => {
 });
 
 test('gamification toggle OFF hides XP UI and keeps classic study', async ({ page }) => {
-  await createDeck(page, 'Classic Deck');
-  await addCard(page, 'Q1', 'A1');
-
+  // Turn gamification off FIRST, then confirm it persisted across a reload.
+  // (Creating a card and then studying it within one SPA session keeps the
+  // card-create→study path reload-free and deterministic.)
   await page.goto('/settings');
   const toggle = page.getByRole('checkbox', { name: /gamification/i });
   await expect(toggle).toBeChecked();
   await toggle.click();
   await expect(toggle).not.toBeChecked();
+  await page.reload();
+  await expect(page.getByRole('checkbox', { name: /gamification/i })).not.toBeChecked();
 
-  await page.goto('/decks');
-  await page.getByRole('link', { name: /classic deck/i }).click();
+  await createDeck(page, 'Classic Deck');
+  await addCard(page, 'Q1', 'A1');
   await page.locator('main').getByRole('link', { name: /^Study$/ }).click();
-
-  // Wait until the study card has actually loaded before asserting absence,
-  // otherwise the count checks pass trivially against the deck-detail page.
-  await page.waitForURL(/\/study/);
-  await expect(page.getByRole('button', { name: /show answer/i })).toBeVisible({ timeout: 15000 });
+  await expect(page.getByRole('button', { name: /show answer/i })).toBeVisible();
 
   // No level bar, no combo while studying.
   await expect(page.getByText(/Lv\s*1/i)).toHaveCount(0);
