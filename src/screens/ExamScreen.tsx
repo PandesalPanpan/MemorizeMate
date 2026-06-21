@@ -7,6 +7,10 @@ import { orderExamCards, scoreAttempt } from '../exam/examLogic';
 import { renderCloze, clozeIndices } from '../cloze/parser';
 import { BackLink } from '../components/BackLink';
 import { Button } from '../components/ui/Button';
+import { XpBar } from '../components/XpBar';
+import { ComboBadge } from '../components/ComboBadge';
+import { XpGainPopup } from '../components/XpGainPopup';
+import { LevelUpOverlay } from '../components/LevelUpOverlay';
 import type { Card, ExamResult } from '../types/models';
 import styles from './ExamScreen.module.css';
 
@@ -28,8 +32,14 @@ export function ExamScreen() {
   const [revealed, setRevealed] = useState(false);
   const [results, setResults] = useState<ExamResult[]>([]);
   const gamified = useStore((s) => s.settings.gamificationEnabled);
+  const soundEnabled = useStore((s) => s.settings.soundEnabled);
+  const reduceMotion = useStore((s) => s.settings.reduceMotion);
+  const profileXp = useStore((s) => s.profile.totalXp);
   const [examXp, setExamXp] = useState(0);
-  const comboRef = useRef(0);
+  const [combo, setCombo] = useState(0);
+  const [popup, setPopup] = useState<{ id: number; amount: number } | null>(null);
+  const [levelUp, setLevelUp] = useState<number | null>(null);
+  const popupIdRef = useRef(0);
 
   async function start() {
     if (!deckId) return;
@@ -39,7 +49,8 @@ export function ExamScreen() {
     ]);
     setQueue(orderExamCards(cards, prior));
     setI(0); setRevealed(false); setResults([]);
-    comboRef.current = 0;
+    setCombo(0);
+    setPopup(null);
     setExamXp(0);
     setPhase('running');
   }
@@ -52,11 +63,13 @@ export function ExamScreen() {
 
     if (gamified) {
       const rating: Rating = !correct ? 'again' : confidence === 2 ? 'easy' : 'good';
-      const { combo: newCombo, xp } = applyGrade(rating, comboRef.current);
-      comboRef.current = newCombo;
+      const { combo: newCombo, xp } = applyGrade(rating, combo);
+      setCombo(newCombo);
       if (xp > 0) {
         setExamXp((x) => x + xp);
-        await store.getState().awardXp(xp, newCombo);
+        setPopup({ id: ++popupIdRef.current, amount: xp });
+        const res = await store.getState().awardXp(xp, newCombo);
+        if (res.leveledUp) setLevelUp(res.toLevel);
       }
     }
     if (i + 1 < queue.length) {
@@ -134,6 +147,23 @@ export function ExamScreen() {
   return (
     <section className={styles.page}>
       <div className={styles.count}>{i + 1} / {queue.length}</div>
+      {gamified && (
+        <div className={styles.xpRow}>
+          <XpBar totalXp={profileXp} compact />
+          <div className={styles.comboWrap}>
+            <ComboBadge combo={combo} />
+            {popup && <XpGainPopup amount={popup.amount} id={popup.id} />}
+          </div>
+        </div>
+      )}
+      {levelUp !== null && (
+        <LevelUpOverlay
+          level={levelUp}
+          onDone={() => setLevelUp(null)}
+          reduceMotion={reduceMotion}
+          soundEnabled={soundEnabled}
+        />
+      )}
       <div className={styles.card}>
         {card.type === 'cloze' ? (
           <p className={styles.prompt}>{revealed ? a : q}</p>

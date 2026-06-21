@@ -1,5 +1,7 @@
 .page { max-width: 640px; margin: 0 auto; text-align: center; }
 .count { font-family: var(--font-mono); color: var(--color-muted); margin-bottom: var(--space-md); }
+.xpRow { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-lg); text-align: left; }
+.comboWrap { position: relative; flex: none; display: flex; align-items: center; min-height: 28px; }
 .card { background: var(--color-surface); border: 1px solid var(--color-line); border-radius: var(--radius-xl); box-shadow: var(--shadow-card); padding: var(--space-xl); margin-bottom: var(--space-lg); min-height: 180px; }
 .prompt { font-family: var(--font-display); font-size: var(--step-2); }
 .answer { margin-top: var(--space-md); padding-top: var(--space-md); border-top: 1px solid var(--color-line); color: var(--color-accent-deep); font-size: var(--step-1); }

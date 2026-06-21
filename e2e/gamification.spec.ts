@@ -95,6 +95,8 @@ test('exam mode awards XP when gamification is on', async ({ page }) => {
 
   await page.locator('main').getByRole('link', { name: /^Exam$/ }).click();
   await page.getByRole('button', { name: /start exam/i }).click();
+  // Gamification UI is present during the exam, not just on the result screen.
+  await expect(page.getByText(/Lv\s*\d+/i)).toBeVisible();
   await page.getByRole('button', { name: /show answer/i }).click();
   await page.getByRole('button', { name: /got it right/i }).click();
 
