@@ -109,6 +109,17 @@ export interface NotificationSettings {
   reminderMinutes: number; // minutes since midnight (0-1439), e.g. 540 = 9:00 AM
 }
 
+/** Per-device gamification progress (XP, level via curve, lifetime best combo). */
+export interface Profile {
+  totalXp: number;
+  bestCombo: number;
+}
+
+export const DEFAULT_PROFILE: Profile = { totalXp: 0, bestCombo: 0 };
+
+/** Default cards per batched study session. */
+export const DEFAULT_SESSION_SIZE = 15;
+
 export interface Settings {
   theme: 'light' | 'dark' | 'auto';
   soundEnabled: boolean;
@@ -122,6 +133,8 @@ export interface Settings {
   fsrsParamsDefaultAccuracy?: number;
   deckSort?: DeckSort;
   cardSort?: CardSort;
+  gamificationEnabled: boolean;
+  sessionSize: number;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -132,4 +145,6 @@ export const DEFAULT_SETTINGS: Settings = {
   showTimer: false,
   onboardingComplete: false,
   notifications: { enabled: false, reminderMinutes: 540 },
+  gamificationEnabled: true,
+  sessionSize: DEFAULT_SESSION_SIZE,
 };

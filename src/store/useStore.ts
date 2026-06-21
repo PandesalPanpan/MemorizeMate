@@ -3,8 +3,9 @@ import type { Repository } from '../data/repository';
 import { repository as defaultRepo } from '../data/indexeddb-repository';
 import { newCard, grade, isDue } from '../fsrs/scheduler';
 import { splitClozeNote, clozeIndices } from '../cloze/parser';
-import type { Deck, Card, Rating, Settings, LivesState, ExamResult, DeckColor, StudySession } from '../types/models';
-import { DEFAULT_SETTINGS, INITIAL_LIVES } from '../types/models';
+import type { Deck, Card, Rating, Settings, LivesState, ExamResult, DeckColor, StudySession, Profile } from '../types/models';
+import { DEFAULT_SETTINGS, INITIAL_LIVES, DEFAULT_PROFILE } from '../types/models';
+import { levelFromXp } from '../gamification/xp';
 import { runOptimization } from '../fsrs/optimizer';
 import { loseLife as loseLifeFn, manualUnlock as unlockFn, endSession as endSessionFn, resolveLives } from '../lives/livesMachine';
 import { scoreAttempt } from '../exam/examLogic';
@@ -41,6 +42,9 @@ export interface StoreState {
   dueCardsMulti(deckIds: string[], now: Date): Promise<Card[]>;
   importBackupMerge(decks: Deck[], cards: Card[], mode: 'skip' | 'overwrite' | 'copies'): Promise<{ decks: number; cards: number }>;
   saveSession(session: StudySession): Promise<void>;
+  profile: Profile;
+  loadProfile(): Promise<void>;
+  awardXp(amount: number, combo?: number): Promise<{ leveledUp: boolean; fromLevel: number; toLevel: number }>;
   fsrsOptimizing: boolean;
   fsrsOptimizeProgress: number;
   optimizeFsrsParams(): Promise<void>;
@@ -54,6 +58,7 @@ export function createStore(repo: Repository = defaultRepo) {
     settings: DEFAULT_SETTINGS,
     error: null,
     lives: { current: INITIAL_LIVES, lastEventAt: 0 },
+    profile: DEFAULT_PROFILE,
     fsrsOptimizing: false,
     fsrsOptimizeProgress: 0,
 
@@ -289,6 +294,27 @@ export function createStore(repo: Repository = defaultRepo) {
 
     async saveSession(session) {
       await get().repo.addSession(session);
+    },
+
+    async loadProfile() {
+      try {
+        set({ profile: await get().repo.getProfile() });
+      } catch (e) { get()._setError(e); }
+    },
+
+    async awardXp(amount, combo) {
+      const prev = get().profile;
+      const fromLevel = levelFromXp(prev.totalXp);
+      const next: Profile = {
+        totalXp: prev.totalXp + Math.max(0, Math.round(amount)),
+        bestCombo: Math.max(prev.bestCombo, combo ?? 0),
+      };
+      const toLevel = levelFromXp(next.totalXp);
+      set({ profile: next });
+      try {
+        await get().repo.putProfile(next);
+      } catch (e) { get()._setError(e); }
+      return { leveledUp: toLevel > fromLevel, fromLevel, toLevel };
     },
 
     async optimizeFsrsParams() {

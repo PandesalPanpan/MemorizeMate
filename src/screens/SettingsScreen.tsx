@@ -60,6 +60,33 @@ export function SettingsScreen() {
       </div>
 
       <div className={styles.group}>
+        <div className={styles.groupTitle}>Gamification</div>
+        <div className={styles.row}>
+          <span className={styles.rowLabel}>XP, levels &amp; celebrations</span>
+          <Toggle
+            label="Gamification"
+            checked={settings.gamificationEnabled}
+            onChange={(v) => set({ gamificationEnabled: v })}
+          />
+        </div>
+        <div className={styles.row}>
+          <Select
+            id="sessionSize"
+            label="Cards per session"
+            value={String(settings.sessionSize)}
+            onChange={(v) => set({ sessionSize: Number(v) })}
+            options={[
+              { value: '10', label: '10' },
+              { value: '15', label: '15' },
+              { value: '20', label: '20' },
+              { value: '25', label: '25' },
+              { value: '30', label: '30' },
+            ]}
+          />
+        </div>
+      </div>
+
+      <div className={styles.group}>
         <div className={styles.groupTitle}>Study</div>
         <div className={styles.row}>
           <span className={styles.rowLabel}>Sound cues</span>

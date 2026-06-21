@@ -16,10 +16,15 @@ export function Layout({ fab }: { fab?: ReactNode }) {
   const lives = useStore((s) => s.lives);
 
   useEffect(() => {
-    const h2 = document.querySelector('main h2') as HTMLElement | null;
-    if (h2) {
-      h2.tabIndex = -1;
-      h2.focus();
+    // Move focus to the page's main heading on navigation for screen-reader
+    // users. Use the FIRST heading (h1 or h2) in document order — the Landing
+    // page leads with an <h1>, so matching only <h2> previously skipped it and
+    // focused "How we compare", scrolling the page mid-way on load.
+    // preventScroll keeps the viewport at the top regardless.
+    const heading = document.querySelector('main h1, main h2') as HTMLElement | null;
+    if (heading) {
+      heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
     }
   }, [location]);
 

@@ -24,6 +24,9 @@ test('create deck, add a card, study it', async ({ page }) => {
   await expect(page.getByText('Paris')).toBeVisible();
   // Rate "Easy" to graduate immediately (new cards rated "Good" go to FSRS learning steps)
   await page.getByRole('button', { name: /easy/i }).click();
+  // Gamification is on by default: finishing a batch shows the session summary.
+  await expect(page.getByTestId('session-summary')).toBeVisible();
+  await page.getByTestId('continue-studying').click();
   await expect(page.getByText(/all done/i)).toBeVisible();
 });
 
@@ -55,6 +58,8 @@ test('cloze card reveals answer inline without duplicate sentence', async ({ pag
   await expect(page.getByText(/\[\.\.\.\]/)).not.toBeVisible();
 
   await page.getByRole('button', { name: /easy/i }).click();
+  await expect(page.getByTestId('session-summary')).toBeVisible();
+  await page.getByTestId('continue-studying').click();
   await expect(page.getByText(/all done/i)).toBeVisible();
 });
 

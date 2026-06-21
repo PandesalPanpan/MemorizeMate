@@ -5,6 +5,12 @@ import { StudyCardSkeleton } from '../components/Skeleton';
 import { BackLink } from '../components/BackLink';
 import { SessionTimer } from '../components/SessionTimer';
 import { Button } from '../components/ui/Button';
+import { XpBar } from '../components/XpBar';
+import { ComboBadge } from '../components/ComboBadge';
+import { XpGainPopup } from '../components/XpGainPopup';
+import { LevelUpOverlay } from '../components/LevelUpOverlay';
+import { SessionSummary } from '../components/SessionSummary';
+import { applyGrade } from '../gamification/xp';
 import { store, useStore } from '../store/useStore';
 import { clozeSegments } from '../cloze/parser';
 import { isLocked } from '../lives/livesMachine';
@@ -34,6 +40,26 @@ export function StudyScreen() {
   const { deckId } = useParams();
   const [searchParams] = useSearchParams();
   const lives = useStore((s) => s.lives);
+  const gamified = useStore((s) => s.settings.gamificationEnabled);
+  const sessionSize = useStore((s) => s.settings.sessionSize);
+  const soundEnabled = useStore((s) => s.settings.soundEnabled);
+  const reduceMotion = useStore((s) => s.settings.reduceMotion);
+  const profileXp = useStore((s) => s.profile.totalXp);
+  const studyAll = searchParams.get('all') === '1';
+  const [reloadNonce, setReloadNonce] = useState(0);
+  const [combo, setCombo] = useState(0);
+  const [popup, setPopup] = useState<{ id: number; amount: number } | null>(null);
+  const [levelUp, setLevelUp] = useState<number | null>(null);
+  const [summary, setSummary] = useState<{
+    ratings: Record<Rating, number>;
+    reviewed: number;
+    durationSec: number;
+    xpEarned: number;
+    bestCombo: number;
+  } | null>(null);
+  const sessionXpRef = useRef(0);
+  const bestComboRef = useRef(0);
+  const popupIdRef = useRef(0);
   const [cardMap, setCardMap] = useState<Map<string, Card> | null>(null);
   const [deckMap, setDeckMap] = useState<Map<string, { name: string; color: string }>>(new Map());
   const [entries, setEntries] = useState<SessionEntry[]>([]);
@@ -63,12 +89,18 @@ export function StudyScreen() {
       const snap = loadSnapshot();
       const restoring = !!snap && snap.key === sessionKey;
 
-      const cards = restoring
+      const allDue = restoring
         ? (await Promise.all(snap!.cardIds.map((cid) => store.getState().repo.getCard(cid))))
             .filter((c): c is Card => !!c)
         : ids.length === 1
           ? await store.getState().dueCards(ids[0], new Date())
           : await store.getState().dueCardsMulti(ids, new Date());
+      // Batched study caps each session to `sessionSize` unique cards. It is the
+      // default ONLY when gamification is on; with it off, study stays classic
+      // (full due set). "Study all" (?all=1) and restored sessions are never
+      // re-capped (restores already persisted their exact card set).
+      const batched = gamified && !studyAll && !restoring;
+      const cards = batched ? allDue.slice(0, sessionSize) : allDue;
       const map = new Map(cards.map((c) => [c.id, c]));
       setCardMap(map);
       // Load deck info for multi-deck color indicators
@@ -112,6 +144,12 @@ export function StudyScreen() {
       setReviewsLimit(revL);
       setLimitDismissed(false);
 
+      // Each (re)load starts a fresh gamification tally for this batch.
+      sessionXpRef.current = 0;
+      bestComboRef.current = 0;
+      setCombo(0);
+      setSummary(null);
+
       const now = Date.now();
       if (restoring) {
         ratingsRef.current = { ...snap!.ratings };
@@ -135,7 +173,7 @@ export function StudyScreen() {
         });
       }
     })();
-  }, [deckId, searchParams, locked]);
+  }, [deckId, searchParams, locked, studyAll, sessionSize, reloadNonce]);
 
   const persistSnapshot = useCallback((nextEntries: SessionEntry[]) => {
     saveSnapshot({
@@ -185,11 +223,60 @@ export function StudyScreen() {
       cardsGraduated: graduatedRef.current,
       ratings: { ...ratingsRef.current },
     });
+    if (gamified && reviewedRef.current > 0) {
+      setSummary({
+        ratings: { ...ratingsRef.current },
+        reviewed: reviewedRef.current,
+        durationSec: Math.max(0, Math.round((Date.now() - startedAtRef.current) / 1000)),
+        xpEarned: sessionXpRef.current,
+        bestCombo: bestComboRef.current,
+      });
+    }
     setEntries((prev) => prev.map((e) => ({ ...e, graduated: true })));
     setCurrent(null);
+  }, [gamified]);
+
+  const continueStudying = useCallback(() => {
+    sessionEndingRef.current = false;
+    setSummary(null);
+    setPopup(null);
+    setCardMap(null);
+    setEntries([]);
+    setCurrent(null);
+    setReloadNonce((n) => n + 1);
   }, []);
 
   if (locked) return <LockoutScreen />;
+
+  if (summary) {
+    const backTo = deckId ? `/decks/${deckId}` : '/decks';
+    const statsTo = deckId ? `/decks/${deckId}/stats` : '/stats';
+    return (
+      <>
+        <BackLink to={backTo} label="Back" />
+        <SessionSummary
+          ratings={summary.ratings}
+          cardsReviewed={summary.reviewed}
+          durationSec={summary.durationSec}
+          xpEarned={summary.xpEarned}
+          bestCombo={summary.bestCombo}
+          totalXp={profileXp}
+          gamified={gamified}
+          onContinue={continueStudying}
+          backTo={backTo}
+          statsTo={statsTo}
+        />
+        {levelUp !== null && (
+          <LevelUpOverlay
+            level={levelUp}
+            onDone={() => setLevelUp(null)}
+            reduceMotion={reduceMotion}
+            soundEnabled={soundEnabled}
+          />
+        )}
+      </>
+    );
+  }
 
   if (!cardMap) return <StudyCardSkeleton />;
 
@@ -253,6 +340,18 @@ export function StudyScreen() {
     ratingsRef.current[r] += 1;
     reviewedRef.current += 1;
 
+    if (gamified) {
+      const { combo: newCombo, xp } = applyGrade(r, combo);
+      setCombo(newCombo);
+      bestComboRef.current = Math.max(bestComboRef.current, newCombo);
+      if (xp > 0) {
+        sessionXpRef.current += xp;
+        setPopup({ id: ++popupIdRef.current, amount: xp });
+        const res = await store.getState().awardXp(xp, newCombo);
+        if (res.leveledUp) setLevelUp(res.toLevel);
+      }
+    }
+
     const updated = gradeEntry(current, r, Date.now());
     if (updated.graduated) graduatedRef.current += 1;
 
@@ -277,6 +376,23 @@ export function StudyScreen() {
           <span className={styles.count}>{remaining} left</span>
         </div>
       </div>
+      {gamified && (
+        <div className={styles.xpRow}>
+          <XpBar totalXp={profileXp} compact />
+          <div className={styles.comboWrap}>
+            <ComboBadge combo={combo} />
+            {popup && <XpGainPopup amount={popup.amount} id={popup.id} />}
+          </div>
+        </div>
+      )}
+      {levelUp !== null && (
+        <LevelUpOverlay
+          level={levelUp}
+          onDone={() => setLevelUp(null)}
+          reduceMotion={reduceMotion}
+          soundEnabled={soundEnabled}
+        />
+      )}
       {(showNewWarning || showReviewWarning) && (
         <div className={styles.limitWarning}>
           <span>{renderLimitWarning()}</span>

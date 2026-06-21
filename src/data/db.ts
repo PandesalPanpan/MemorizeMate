@@ -1,5 +1,5 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
-import type { Deck, Card, ReviewLog, Settings, ExamAttempt, LivesState, StudySession } from '../types/models';
+import type { Deck, Card, ReviewLog, Settings, ExamAttempt, LivesState, StudySession, Profile } from '../types/models';
 import { DECK_COLORS } from '../types/models';
 import { clozeIndices, splitClozeNote } from '../cloze/parser';
 import { newCard } from '../fsrs/scheduler';
@@ -8,7 +8,7 @@ export interface MMDB extends DBSchema {
   decks: { key: string; value: Deck };
   cards: { key: string; value: Card; indexes: { byDeck: string } };
   reviewLogs: { key: string; value: ReviewLog; indexes: { byCard: string } };
-  settings: { key: string; value: Settings | LivesState };
+  settings: { key: string; value: Settings | LivesState | Profile };
   examAttempts: { key: string; value: ExamAttempt; indexes: { byDeck: string } };
   sessions: { key: string; value: StudySession; indexes: { byDeck: string } };
 }

@@ -1,0 +1,20 @@
+.popup {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: var(--step-1);
+  color: var(--color-good);
+  text-shadow: 0 1px 0 var(--color-bg);
+  pointer-events: none;
+  white-space: nowrap;
+  animation: floatUp 0.9s ease-out forwards;
+}
+
+@keyframes floatUp {
+  0% { opacity: 0; transform: translate(-50%, 8px) scale(0.8); }
+  20% { opacity: 1; transform: translate(-50%, -2px) scale(1.1); }
+  100% { opacity: 0; transform: translate(-50%, -38px) scale(1); }
+}

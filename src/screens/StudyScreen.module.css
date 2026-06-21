@@ -1,6 +1,13 @@
 .bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-lg); }
 .barRight { display: flex; align-items: center; gap: var(--space-md); }
 .count { font-family: var(--font-mono); color: var(--color-muted); }
+.xpRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+.comboWrap { position: relative; flex: none; display: flex; align-items: center; min-height: 28px; }
 .done { text-align: center; padding: var(--space-2xl) var(--space-lg); }
 .done .emoji { font-size: 3rem; }
 .waiting { display: flex; flex-direction: column; align-items: center; gap: var(--space-md); padding: var(--space-xl); }

@@ -23,6 +23,7 @@
 .deckName { flex: 1; font-weight: 600; }
 .deckDue { color: var(--color-muted); font-family: var(--font-mono); font-size: var(--step--1); }
 .chevron { color: var(--color-muted); font-size: var(--step-1); }
+.xpCard { background: var(--color-surface); border: 1px solid var(--color-line); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); padding: var(--space-md) var(--space-lg); margin-bottom: var(--space-lg); }
 .activity { margin-top: var(--space-xl); }
 .activity h3 { margin-bottom: var(--space-md); }
 .card { display: block; background: var(--color-surface); border: 1px solid var(--color-line); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); padding: var(--space-lg); overflow-x: auto; max-width: 100%; }

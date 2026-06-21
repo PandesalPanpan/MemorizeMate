@@ -1,11 +1,12 @@
 import type { IDBPDatabase } from 'idb';
 import { openMMDB, type MMDB } from './db';
 import type { Repository } from './repository';
-import type { Deck, Card, ReviewLog, Settings, ExamAttempt, LivesState, StudySession } from '../types/models';
-import { DEFAULT_SETTINGS, INITIAL_LIVES } from '../types/models';
+import type { Deck, Card, ReviewLog, Settings, ExamAttempt, LivesState, StudySession, Profile } from '../types/models';
+import { DEFAULT_SETTINGS, INITIAL_LIVES, DEFAULT_PROFILE } from '../types/models';
 
 const SETTINGS_KEY = 'app';
 const LIVES_KEY = 'lives';
+const PROFILE_KEY = 'profile';
 
 export class IndexedDbRepository implements Repository {
   private dbp: Promise<IDBPDatabase<MMDB>>;
@@ -106,6 +107,14 @@ export class IndexedDbRepository implements Repository {
   }
   async putLives(lives: LivesState): Promise<void> {
     await (await this.dbp).put('settings', lives, LIVES_KEY);
+  }
+
+  async getProfile(): Promise<Profile> {
+    const v = (await (await this.dbp).get('settings', PROFILE_KEY)) as Profile | undefined;
+    return { ...DEFAULT_PROFILE, ...(v ?? {}) };
+  }
+  async putProfile(profile: Profile): Promise<void> {
+    await (await this.dbp).put('settings', profile, PROFILE_KEY);
   }
 
   async searchCards(query: string, deckId?: string): Promise<Card[]> {

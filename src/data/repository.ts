@@ -1,4 +1,4 @@
-import type { Deck, Card, ReviewLog, Settings, ExamAttempt, LivesState, StudySession } from '../types/models';
+import type { Deck, Card, ReviewLog, Settings, ExamAttempt, LivesState, StudySession, Profile } from '../types/models';
 
 export interface Repository {
   // decks
@@ -36,6 +36,10 @@ export interface Repository {
   // lives
   getLives(): Promise<LivesState>;
   putLives(lives: LivesState): Promise<void>;
+
+  // gamification profile
+  getProfile(): Promise<Profile>;
+  putProfile(profile: Profile): Promise<void>;
 
   // search
   searchCards(query: string, deckId?: string): Promise<Card[]>;

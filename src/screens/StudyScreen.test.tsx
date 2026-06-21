@@ -34,7 +34,8 @@ describe('StudyScreen', () => {
     await userEvent.click(screen.getByRole('button', { name: /show answer/i }));
     expect(screen.getByText('A')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: /easy/i }));
-    expect(await screen.findByText(/all done/i)).toBeInTheDocument();
+    // Gamification on by default: a finished batch shows the session summary.
+    expect(await screen.findByTestId('session-summary')).toBeInTheDocument();
   });
 
   it('reveals cloze answer inline without duplicating the sentence', async () => {
@@ -55,6 +56,6 @@ describe('StudyScreen', () => {
     expect(screen.queryByText(/\[\.\.\.\]/)).not.toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: /easy/i }));
-    expect(await screen.findByText(/all done/i)).toBeInTheDocument();
+    expect(await screen.findByTestId('session-summary')).toBeInTheDocument();
   });
 });
